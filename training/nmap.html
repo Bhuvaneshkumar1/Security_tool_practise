@@ -6,7 +6,7 @@
 <title>Nmap Practice – Optimized</title>
 
 <style>
-:root{--bg:#0e111a;--card:#151a2d;--fg:#e6e8f0;--muted:#9aa1c7;--accent:#3b6cff}
+:root{--bg:#0e111a;--card:#151a2d;--fg:#e6e8f0;--muted:#9aa1c7;--accent:#3b6cff;--error:#ff5c5c}
 *{box-sizing:border-box}
 body{margin:0;font-family:system-ui,Arial;background:var(--bg);color:var(--fg)}
 main{max-width:1100px;margin:auto;padding:16px}
@@ -25,6 +25,7 @@ button{margin-top:12px;background:var(--accent);border:none;font-weight:600}
 pre{background:#0a0d1a;border:1px solid #262b55;border-radius:6px;padding:12px;white-space:pre-wrap}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 small{color:var(--muted)}
+.error{color:var(--error)}
 </style>
 </head>
 
@@ -33,7 +34,7 @@ small{color:var(--muted)}
 
 <div class="card">
 <h1>Nmap Practice – Optimized Learning Mode</h1>
-<small>Static simulator. No execution.</small>
+<small>Live execution via backend</small>
 </div>
 
 <div class="card">
@@ -51,7 +52,7 @@ small{color:var(--muted)}
 </div>
 <div>
 <label for="preset">Preset</label>
-<select id="preset" title="Nmap preset options"></select>
+<select id="preset"></select>
 </div>
 </div>
 
@@ -61,7 +62,7 @@ small{color:var(--muted)}
 <label>Extra Flags</label>
 <input id="extra" placeholder="-Pn -v">
 
-<button id="build">Build Command</button>
+<button id="build">Run Nmap</button>
 </div>
 
 <div class="card">
@@ -74,17 +75,16 @@ small{color:var(--muted)}
 <script>
 (() => {
 const data = [
- {name:"Basic scan", flags:"", example:"nmap target"},
- {name:"Ping scan", flags:"-sn", example:"nmap -sn target"},
- {name:"Port scan", flags:"-p 22,80,443", example:"nmap -p 22,80,443 target"},
- {name:"Verbose", flags:"-v", example:"nmap -v target"},
- {name:"Save output", flags:"-oN out.txt", example:"nmap -oN out.txt target"},
- {name:"Service detection", flags:"-sV", example:"nmap -sV target"},
- {name:"OS detection", flags:"-O", example:"nmap -O target"},
- {name:"Default scripts", flags:"-sC", example:"nmap -sC target"},
- {name:"Aggressive", flags:"-A", example:"nmap -A target"},
- {name:"TCP SYN", flags:"-sS", example:"nmap -sS target"},
- {name:"UDP", flags:"-sU", example:"nmap -sU target"}
+ {name:"Basic scan", flags:""},
+ {name:"Ping scan", flags:"-sn"},
+ {name:"Port scan", flags:"-p 22,80,443"},
+ {name:"Verbose", flags:"-v"},
+ {name:"Service detection", flags:"-sV"},
+ {name:"OS detection", flags:"-O"},
+ {name:"Default scripts", flags:"-sC"},
+ {name:"Aggressive", flags:"-A"},
+ {name:"TCP SYN", flags:"-sS"},
+ {name:"UDP", flags:"-sU"}
 ];
 
 const $ = id => document.getElementById(id);
@@ -92,40 +92,63 @@ const ref = $('ref');
 const preset = $('preset');
 const out = $('out');
 
+preset.innerHTML = `<option value="">Custom</option>`;
+
 data.forEach((d,i)=>{
-  const li=document.createElement('li');
-  li.innerHTML=`<b>${d.name}</b> – <code>${d.example}</code>`;
-  li.onclick=()=>preset.selectedIndex=i+1;
+  const li = document.createElement('li');
+  li.innerHTML = `<b>${d.name}</b> – <code>nmap ${d.flags || "target"}</code>`;
+  li.onclick = () => preset.selectedIndex = i + 1;
   ref.appendChild(li);
 
-  const o=document.createElement('option');
-  o.value=d.flags;
-  o.textContent=d.name;
+  const o = document.createElement('option');
+  o.value = d.flags;
+  o.textContent = d.name;
   preset.appendChild(o);
 });
 
-preset.insertAdjacentHTML('afterbegin','<option value="">Custom</option>');
-
 $('build').onclick = async () => {
-  const t = $('target').value.trim();
-  if (!t) { out.textContent = "Invalid target"; return; }
+  out.classList.remove("error");
+  out.textContent = "Running…";
+
+  const target = $('target').value.trim();
+  if (!target) {
+    out.textContent = "Error: Target is required";
+    out.classList.add("error");
+    return;
+  }
 
   const args = [];
   if (preset.value) args.push(preset.value);
   if ($('ports').value) args.push("-p", $('ports').value.trim());
   if ($('extra').value) args.push($('extra').value.trim());
-  args.push(t);
+  args.push(target);
 
-  const res = await fetch("/run/nmap", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ args: args.join(" ") })
-  });
+  try {
+    const res = await fetch("/run/nmap", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ args: args.join(" ") })
+    });
 
-  const data = await res.json();
-  out.textContent = data.stdout || data.stderr;
+    const text = await res.text();
+    let payload;
+    try { payload = JSON.parse(text); } catch { payload = { stderr: text }; }
+
+    if (!res.ok) {
+      out.textContent = payload.detail || payload.stderr || "Backend error";
+      out.classList.add("error");
+      return;
+    }
+
+    out.textContent = payload.stdout || payload.stderr || "No output";
+    if (payload.stderr) out.classList.add("error");
+
+  } catch (e) {
+    out.textContent = "Network / backend unreachable";
+    out.classList.add("error");
+  }
 };
-alert("Educational use only. Simulation only.");
+
 })();
 </script>
 
