@@ -37,7 +37,7 @@ small{color:var(--muted)}
 </div>
 
 <div class="card">
-<h2>Command Reference (click to load)</h2>
+<h2>Command Reference</h2>
 <ul id="ref"></ul>
 </div>
 
@@ -61,7 +61,7 @@ small{color:var(--muted)}
 <label>Extra Flags</label>
 <input id="extra" placeholder="-Pn -v">
 
-<a href="/run/nmap"><button id="build">Build Command</button></a>
+<button id="build">Build Command</button>
 </div>
 
 <div class="card">
@@ -106,17 +106,25 @@ data.forEach((d,i)=>{
 
 preset.insertAdjacentHTML('afterbegin','<option value="">Custom</option>');
 
-$('build').onclick=()=>{
-  const t=$('target').value.trim();
-  if(!t){out.textContent="Invalid target";return;}
-  const cmd=["nmap"];
-  if(preset.value)cmd.push(preset.value);
-  if($('ports').value)cmd.push("-p",$('ports').value.trim());
-  if($('extra').value)cmd.push($('extra').value.trim());
-  cmd.push(t);
-  out.textContent=cmd.join(" ")+"\n\nSimulation only.";
-};
+$('build').onclick = async () => {
+  const t = $('target').value.trim();
+  if (!t) { out.textContent = "Invalid target"; return; }
 
+  const args = [];
+  if (preset.value) args.push(preset.value);
+  if ($('ports').value) args.push("-p", $('ports').value.trim());
+  if ($('extra').value) args.push($('extra').value.trim());
+  args.push(t);
+
+  const res = await fetch("/run/nmap", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ args: args.join(" ") })
+  });
+
+  const data = await res.json();
+  out.textContent = data.stdout || data.stderr;
+};
 alert("Educational use only. Simulation only.");
 })();
 </script>
