@@ -69,11 +69,11 @@ async def run_nmap(payload: NmapRequest):
 
 # ----------------- NETCAT (HTTP, ONE-SHOT) -----------------
 
-class NetcatListenRequest(BaseModel):
+class NetcatListenRequest(BaseModel): # type: ignore
     port: int
     flags: str = ""
 
-class NetcatConnectRequest(BaseModel):
+class NetcatConnectRequest(BaseModel): # type: ignore
     host: str
     port: int
     flags: str = ""
@@ -134,47 +134,53 @@ async def netcat_connect(payload: NetcatConnectRequest):
 
 # ----------------- NETCAT (WEBSOCKET STREAMING) -----------------
 
-sessions: Dict[str, Dict[str, WebSocket]] = {}
+@app.get("/netcat/listener")
+async def netcat_listener():
+    system_check()
+    return FileResponse(os.path.join(TRAINING_DIR, "netcat.html"))
 
-@app.websocket("/ws/netcat")
-async def ws_netcat(websocket: WebSocket):
-    await websocket.accept()
+@app.get("/netcat/client")
+async def netcat_client():
+    system_check()
+    return FileResponse(os.path.join(TRAINING_DIR, "netcat.html"))
 
-    role = websocket.query_params.get("role")
-    host = websocket.query_params.get("host")
-    port = websocket.query_params.get("port")
+# ---------- NETCAT BACKEND ----------
 
-    if not port or role not in ("listener", "client"):
-        await websocket.send_text("[error] invalid parameters")
-        await websocket.close()
-        return
+class NetcatListenRequest(BaseModel):
+    port: int
 
-    # session key = port
-    session = sessions.setdefault(port, {})
+class NetcatConnectRequest(BaseModel):
+    host: str
+    port: int
+    message: str = ""
 
-    session[role] = websocket
+@app.post("/run/netcat/listen")
+async def run_netcat_listen(payload: NetcatListenRequest):
+    system_check()
+    cmd = ["nc", "-l", str(payload.port)]
+    result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+    return {
+        "stdout": result.stdout,
+        "stderr": result.stderr,
+        "code": result.returncode
+    }
 
-    await websocket.send_text(f"[connected] role={role} port={port}")
-
-    try:
-        while True:
-            msg = await websocket.receive_text()
-
-            # pair routing
-            if role == "listener" and "client" in session:
-                await session["client"].send_text(msg)
-
-            elif role == "client" and "listener" in session:
-                await session["listener"].send_text(msg)
-
-            else:
-                await websocket.send_text("[waiting] peer not connected")
-
-    except WebSocketDisconnect:
-        session.pop(role, None)
-        if not session:
-            sessions.pop(port, None)
-
+@app.post("/run/netcat/connect")
+async def run_netcat_connect(payload: NetcatConnectRequest):
+    system_check()
+    cmd = ["nc", payload.host, str(payload.port)]
+    result = subprocess.run(
+        cmd,
+        input=payload.message,
+        capture_output=True,
+        text=True,
+        timeout=30
+    )
+    return {
+        "stdout": result.stdout,
+        "stderr": result.stderr,
+        "code": result.returncode
+    }
 # ----------------- MAIN -----------------
 
 if __name__ == "__main__":
