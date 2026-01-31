@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SQLMap – Theory & Safe Practice</title>
+
+<style>
+:root{
+  --bg:#0b0f1a;--panel:#151c38;--fg:#e8ebff;--muted:#9aa3d1;
+  --accent:#22c55e;--border:#27306a;--code:#020617;--warn:#f59e0b;--err:#ef4444;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;font-family:ui-monospace,Menlo,Consolas,monospace;
+  background:radial-gradient(1200px 600px at 20% -10%,#141b3a 0%,var(--bg) 60%);
+  color:var(--fg)
+}
+header{padding:18px 24px;border-bottom:1px solid var(--border);background:#0b1024}
+header h1{margin:0;font-size:22px}
+main{max-width:1100px;margin:auto;padding:24px;display:grid;gap:20px}
+.section{background:linear-gradient(180deg,var(--panel),#0f1533);border:1px solid var(--border);border-radius:14px;padding:20px}
+label{display:block;margin-top:10px;color:var(--muted)}
+input,select,button{width:100%;margin-top:6px;padding:10px;border-radius:8px;border:1px solid var(--border);background:#060b20;color:var(--fg)}
+button{margin-top:14px;background:linear-gradient(135deg,#22c55e,#16a34a);border:none;font-weight:700;cursor:pointer}
+pre{background:#020617;border:1px solid #1e293b;border-radius:12px;padding:14px;height:260px;overflow:auto}
+.hidden{display:none}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>SQLMap</h1>
+</header>
+
+<main>
+
+<section class="section">
+
+<label>Target URL</label>
+<input id="url" placeholder="Enter target URL" value="http://testphp.vulnweb.com/listproducts.php?cat=1&id=2">
+
+<label>Parameter</label>
+<select id="param" title="Select parameter to test">
+  <option value="">Auto</option>
+  <option value="cat">cat</option>
+  <option value="id">id</option>
+</select>
+
+<label>Action</label>
+<select id="action" title="Select action to perform">
+  <option value="">Detection only</option>
+  <option value="--dbs">Enumerate databases</option>
+  <option value="--tables">Enumerate tables</option>
+</select>
+
+<label><input type="checkbox" id="waf"> Detect WAF</label>
+
+<button id="run">Run SQLMap</button>
+
+<h3>Command Executed</h3>
+<pre id="cmd">—</pre>
+
+<h3>Output</h3>
+<pre id="out">—</pre>
+
+<button id="download" class="hidden">Download Report</button>
+
+</section>
+
+</main>
+
+<script>
+document.getElementById("run").onclick = async () => {
+  const out = document.getElementById("out");
+  const cmdBox = document.getElementById("cmd");
+  const downloadBtn = document.getElementById("download");
+
+  downloadBtn.classList.add("hidden");
+  out.textContent = "Running SQLMap…";
+
+  const res = await fetch("/run/sqlmap", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-API-Key": "sqlmap-training-key"
+    },
+    body: JSON.stringify({
+      url: document.getElementById("url").value,
+      param: document.getElementById("param").value,
+      action: document.getElementById("action").value,
+      detect_waf: document.getElementById("waf").checked
+    })
+  });
+
+  const data = await res.json();
+  cmdBox.textContent = data.command || "—";
+  out.textContent = data.stdout || data.stderr || "No output";
+
+  if (data.report_id) {
+    downloadBtn.classList.remove("hidden");
+    downloadBtn.onclick = () => {
+      window.location = `/download/sqlmap/${data.report_id}`;
+    };
+  }
+};
+</script>
+
+</body>
+</html>
