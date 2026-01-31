@@ -6,42 +6,184 @@
 <title>Nmap Practice – Optimized</title>
 
 <style>
-:root{--bg:#0e111a;--card:#151a2d;--fg:#e6e8f0;--muted:#9aa1c7;--accent:#3b6cff;--error:#ff5c5c}
-*{box-sizing:border-box}
-body{margin:0;font-family:system-ui,Arial;background:var(--bg);color:var(--fg)}
-main{max-width:1100px;margin:auto;padding:16px}
-.card{background:var(--card);border:1px solid #262b55;border-radius:8px;padding:16px;margin-bottom:16px}
-h1,h2{margin:0 0 10px}
-ul{margin:0 0 10px 18px;padding:0}
-li{margin:6px 0;cursor:pointer}
-li:hover{color:var(--accent)}
-code{background:#0a0d1a;padding:2px 5px;border-radius:4px}
-label{display:block;margin-top:8px}
-input,select,button{
- width:100%;padding:8px;border-radius:6px;
- border:1px solid #262b55;background:#0a0d1a;color:var(--fg)
+:root{
+  --bg:#0b0f1a;
+  --panel:#11172a;
+  --card:#151c38;
+  --fg:#e8ebff;
+  --muted:#9aa3d1;
+  --accent:#4f7cff;
+  --accent-2:#00e5ff;
+  --border:#27306a;
+  --error:#ff5c5c;
+  --success:#00ff9c;
+  --terminal:#020617;
 }
-button{margin-top:12px;background:var(--accent);border:none;font-weight:600}
-pre{background:#0a0d1a;border:1px solid #262b55;border-radius:6px;padding:12px;white-space:pre-wrap}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-small{color:var(--muted)}
-.error{color:var(--error)}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  background:radial-gradient(1200px 600px at 20% -10%,#141b3a 0%,var(--bg) 60%);
+  color:var(--fg);
+}
+
+header{
+  position:sticky;
+  top:0;
+  z-index:10;
+  background:linear-gradient(90deg,#0b1024,#111944);
+  border-bottom:1px solid var(--border);
+}
+
+header h1{
+  margin:0;
+  padding:16px 24px 4px;
+  font-size:22px;
+}
+
+header small{
+  display:block;
+  padding:0 24px 14px;
+  color:var(--muted);
+}
+
+main{
+  max-width:1400px;
+  margin:auto;
+  padding:24px;
+  display:grid;
+  grid-template-columns: 2fr 1fr;
+  gap:20px;
+}
+
+.card{
+  background:linear-gradient(180deg,var(--card),#0f1533);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:18px;
+  box-shadow:0 10px 40px rgba(0,0,0,.35);
+}
+
+h2{
+  margin:0 0 14px;
+  font-size:16px;
+  color:var(--accent-2);
+  letter-spacing:.5px;
+}
+
+label{
+  display:block;
+  margin-top:10px;
+  font-size:12px;
+  color:var(--muted);
+}
+
+input,select{
+  width:100%;
+  margin-top:4px;
+  padding:10px 12px;
+  border-radius:8px;
+  border:1px solid var(--border);
+  background:#060b20;
+  color:var(--fg);
+}
+
+input:focus,select:focus{
+  outline:none;
+  border-color:var(--accent);
+}
+
+button{
+  width:100%;
+  margin-top:14px;
+  padding:12px;
+  border-radius:10px;
+  border:none;
+  background:linear-gradient(135deg,var(--accent),#2e4bff);
+  color:white;
+  font-weight:700;
+  letter-spacing:.6px;
+  cursor:pointer;
+}
+
+button:hover{
+  filter:brightness(1.1);
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+
+ul{
+  list-style:none;
+  padding:0;
+  margin:0;
+}
+
+li{
+  padding:8px 10px;
+  margin-bottom:6px;
+  border-radius:6px;
+  border:1px solid transparent;
+  cursor:pointer;
+}
+
+li:hover{
+  background:#0b1230;
+  border-color:var(--border);
+}
+
+code{
+  background:#050818;
+  padding:2px 6px;
+  border-radius:4px;
+  color:var(--accent-2);
+}
+
+pre{
+  background:linear-gradient(180deg,var(--terminal),#020617);
+  border:1px solid #1e293b;
+  border-radius:12px;
+  padding:16px;
+  height:320px;
+  overflow:auto;
+  font-size:13px;
+  line-height:1.5;
+  color:#c7d2fe;
+}
+
+pre::before{
+  content:"terminal";
+  display:block;
+  color:#64748b;
+  font-size:11px;
+  margin-bottom:6px;
+}
+
+.error{
+  color:var(--error);
+}
+
+@media(max-width:1000px){
+  main{grid-template-columns:1fr}
+}
 </style>
 </head>
 
 <body>
+
+<header>
+  <h1>Nmap Practice Console</h1>
+  <small>Interactive backend-powered reconnaissance environment</small>
+</header>
+
 <main>
 
-<div class="card">
-<h1>Nmap Practice – Optimized Learning Mode</h1>
-<small>Live execution via backend</small>
-</div>
-
-<div class="card">
-<h2>Command Reference</h2>
-<ul id="ref"></ul>
-</div>
-
+<!-- LEFT COLUMN -->
 <div class="card">
 <h2>Command Builder</h2>
 
@@ -51,8 +193,8 @@ small{color:var(--muted)}
 <input id="target" placeholder="IP / CIDR / Domain">
 </div>
 <div>
-<label for="preset">Preset</label>
-<select id="preset"></select>
+<label>Preset</label>
+<select id="preset" title="Select a preset nmap scan configuration"></select>
 </div>
 </div>
 
@@ -62,10 +204,17 @@ small{color:var(--muted)}
 <label>Extra Flags</label>
 <input id="extra" placeholder="-Pn -v">
 
-<button id="build">Run Nmap</button>
+<button id="build">RUN NMAP</button>
 </div>
 
+<!-- RIGHT COLUMN -->
 <div class="card">
+<h2>Command Reference</h2>
+<ul id="ref"></ul>
+</div>
+
+<!-- FULL WIDTH OUTPUT -->
+<div class="card" style="grid-column:1/-1">
 <h2>Output</h2>
 <pre id="out">—</pre>
 </div>
@@ -96,7 +245,7 @@ preset.innerHTML = `<option value="">Custom</option>`;
 
 data.forEach((d,i)=>{
   const li = document.createElement('li');
-  li.innerHTML = `<b>${d.name}</b> – <code>nmap ${d.flags || "target"}</code>`;
+  li.innerHTML = `<b>${d.name}</b><br><code>nmap ${d.flags || "target"}</code>`;
   li.onclick = () => preset.selectedIndex = i + 1;
   ref.appendChild(li);
 
