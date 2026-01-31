@@ -84,7 +84,10 @@ def validate_sqlmap(payload: SQLMapRequest):
         raise HTTPException(status_code=400, detail="Action not allowed")
 
 @app.post("/run/sqlmap")
-async def run_sqlmap(payload: SQLMapRequest = Body(...), request: Optional[Request] = None):
+async def run_sqlmap(
+    request: Request,
+    payload: SQLMapRequest = Body(...),
+):
     system_check()
     auth_and_rate_limit(request)
 
