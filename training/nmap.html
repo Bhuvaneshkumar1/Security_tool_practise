@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nmap Practice – Optimized</title>
+
+<style>
+:root{--bg:#0e111a;--card:#151a2d;--fg:#e6e8f0;--muted:#9aa1c7;--accent:#3b6cff}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,Arial;background:var(--bg);color:var(--fg)}
+main{max-width:1100px;margin:auto;padding:16px}
+.card{background:var(--card);border:1px solid #262b55;border-radius:8px;padding:16px;margin-bottom:16px}
+h1,h2{margin:0 0 10px}
+ul{margin:0 0 10px 18px;padding:0}
+li{margin:6px 0;cursor:pointer}
+li:hover{color:var(--accent)}
+code{background:#0a0d1a;padding:2px 5px;border-radius:4px}
+label{display:block;margin-top:8px}
+input,select,button{
+ width:100%;padding:8px;border-radius:6px;
+ border:1px solid #262b55;background:#0a0d1a;color:var(--fg)
+}
+button{margin-top:12px;background:var(--accent);border:none;font-weight:600}
+pre{background:#0a0d1a;border:1px solid #262b55;border-radius:6px;padding:12px;white-space:pre-wrap}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+small{color:var(--muted)}
+</style>
+</head>
+
+<body>
+<main>
+
+<div class="card">
+<h1>Nmap Practice – Optimized Learning Mode</h1>
+<small>Static simulator. No execution.</small>
+</div>
+
+<div class="card">
+<h2>Command Reference (click to load)</h2>
+<ul id="ref"></ul>
+</div>
+
+<div class="card">
+<h2>Command Builder</h2>
+
+<div class="grid">
+<div>
+<label>Target</label>
+<input id="target" placeholder="IP / CIDR / Domain">
+</div>
+<div>
+<label for="preset">Preset</label>
+<select id="preset" title="Nmap preset options"></select>
+</div>
+</div>
+
+<label>Ports</label>
+<input id="ports" placeholder="22,80,443">
+
+<label>Extra Flags</label>
+<input id="extra" placeholder="-Pn -v">
+
+<a href="/run/nmap?args="><button id="build">Build Command</button></a>
+</div>
+
+<div class="card">
+<h2>Output</h2>
+<pre id="out">—</pre>
+</div>
+
+</main>
+
+<script>
+(() => {
+const data = [
+ {name:"Basic scan", flags:"", example:"nmap target"},
+ {name:"Ping scan", flags:"-sn", example:"nmap -sn target"},
+ {name:"Port scan", flags:"-p 22,80,443", example:"nmap -p 22,80,443 target"},
+ {name:"Verbose", flags:"-v", example:"nmap -v target"},
+ {name:"Save output", flags:"-oN out.txt", example:"nmap -oN out.txt target"},
+ {name:"Service detection", flags:"-sV", example:"nmap -sV target"},
+ {name:"OS detection", flags:"-O", example:"nmap -O target"},
+ {name:"Default scripts", flags:"-sC", example:"nmap -sC target"},
+ {name:"Aggressive", flags:"-A", example:"nmap -A target"},
+ {name:"TCP SYN", flags:"-sS", example:"nmap -sS target"},
+ {name:"UDP", flags:"-sU", example:"nmap -sU target"}
+];
+
+const $ = id => document.getElementById(id);
+const ref = $('ref');
+const preset = $('preset');
+const out = $('out');
+
+data.forEach((d,i)=>{
+  const li=document.createElement('li');
+  li.innerHTML=`<b>${d.name}</b> – <code>${d.example}</code>`;
+  li.onclick=()=>preset.selectedIndex=i+1;
+  ref.appendChild(li);
+
+  const o=document.createElement('option');
+  o.value=d.flags;
+  o.textContent=d.name;
+  preset.appendChild(o);
+});
+
+preset.insertAdjacentHTML('afterbegin','<option value="">Custom</option>');
+
+$('build').onclick=()=>{
+  const t=$('target').value.trim();
+  if(!t){out.textContent="Invalid target";return;}
+  const cmd=["nmap"];
+  if(preset.value)cmd.push(preset.value);
+  if($('ports').value)cmd.push("-p",$('ports').value.trim());
+  if($('extra').value)cmd.push($('extra').value.trim());
+  cmd.push(t);
+  out.textContent=cmd.join(" ")+"\n\nSimulation only.";
+};
+
+alert("Educational use only. Simulation only.");
+})();
+</script>
+
+</body>
+</html>
