@@ -4,6 +4,9 @@ from fastapi import FastAPI, HTTPException, Body
 import subprocess
 from fastapi.responses import FileResponse
 import uvicorn
+from pydantic import BaseModel
+class Nmaprequest(BaseModel):
+    args: str
 
 app = FastAPI()
 
@@ -28,9 +31,9 @@ async def read_nmap():
     return FileResponse(os.path.join(TRAINING_DIR, "nmap.html"))
 
 @app.post("/run/nmap")
-async def run_nmap(args: str = Body(...)):
+async def run_nmap(payload:Nmaprequest):
     system_check()
-    cmd = ["nmap"] + args.split()
+    cmd = ["nmap"] + payload.args.split()
     try:
         result = subprocess.run(
             cmd,
