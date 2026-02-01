@@ -226,17 +226,17 @@ footer{
 </button>
 <script>
 const REQUIRED_TOOLS = [
-  "/nmap",
-  "/sqlmap",
-  "/netcat",
-  "/metasploit",
-  "/password_cracking",
-  "/john",
-  "/hydra"
+  "nmap",
+  "sqlmap",
+  "netcat",
+  "metasploit",
+  "password_cracking",
+  "john",
+  "hydra"
 ];
 
 const completed = REQUIRED_TOOLS.filter(
-  p => localStorage.getItem(`lesson:${p}`) === "done"
+  id => localStorage.getItem(`lesson:${id}`) === "done"
 ).length;
 
 const percent = Math.round((completed / REQUIRED_TOOLS.length) * 100);
