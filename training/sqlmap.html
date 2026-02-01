@@ -21,7 +21,6 @@ html, body {
   --muted:#9aa3d1;
   --accent:#22c55e;
   --border:#27306a;
-  --code:#020617;
   --error:#ef4444;
 }
 
@@ -30,9 +29,8 @@ html, body {
 body{
   margin:0;
   font-family: ui-monospace, Menlo, Consolas, monospace;
-  background:
-    radial-gradient(1200px 600px at 20% -10%,#141b3a 0%,var(--bg) 60%);
-  color:var(--fg);
+  background: radial-gradient(1200px 600px at 20% -10%, #141b3a 0%, var(--bg) 60%);
+  color: var(--fg);
 }
 
 /* ===== HEADER ===== */
@@ -53,14 +51,16 @@ main{
   overflow-x:hidden;
 }
 
-/* ===== PANELS ===== */
+/* ===== SECTIONS ===== */
 .section{
   background:linear-gradient(180deg,var(--panel),#0f1533);
   border:1px solid var(--border);
   border-radius:14px;
   margin-bottom:20px;
   padding:22px;
-  overflow-x:hidden;
+
+  /* FIREFOX FIX */
+  min-width: 0;
 }
 
 .section h2{
@@ -69,13 +69,6 @@ main{
   font-size:18px;
 }
 
-.section p{
-  color:var(--muted);
-  font-size:14px;
-  line-height:1.7;
-}
-
-/* ===== FORM ===== */
 label{
   display:block;
   font-size:13px;
@@ -102,51 +95,50 @@ button{
 
 button:hover{opacity:.9}
 
-/* ===== COMMAND PREVIEW ===== */
+/* ===== COMMAND ===== */
 .command{
+  font-size:13px;
+  padding:10px;
   background:#020617;
   border:1px solid #1e293b;
   border-radius:10px;
-  padding:10px;
-  font-size:13px;
-  margin-top:10px;
 
-  max-width:100%;
-  overflow-x:auto;
-  white-space:pre-wrap;
-  word-break:break-all;
+  word-break: break-all;
+  max-inline-size: 100%;
 }
 
-/* ===== OUTPUT CONTAINMENT (CRITICAL) ===== */
-.output-wrapper{
-  width:100%;
-  max-width:100%;
-  overflow-x:hidden;
-  contain: layout paint; /* KILL SWITCH */
-}
-
-pre{
-  display:block;
+/* ===== OUTPUT (FIREFOX-PROOF) ===== */
+.output-grid{
+  display:grid;
+  grid-template-columns: 1fr;
 
   width:100%;
   max-width:100%;
-  max-height:420px;
+  min-width:0;              /* KEY FIX */
+  overflow:hidden;
+}
 
-  padding:14px;
-  box-sizing:border-box;
-
-  overflow-x:auto;
-  overflow-y:auto;
-
-  white-space:pre-wrap;
-  word-break:break-word;
-  overflow-wrap:anywhere;
-
+.terminal{
   background:#020617;
   border:1px solid #1e293b;
   border-radius:12px;
+  padding:14px;
+
+  height:420px;
+  overflow-y:auto;
+  overflow-x:hidden;
 
   font-size:13px;
+  line-height:1.5;
+
+  min-width:0;              /* KEY FIX */
+  max-inline-size:100%;     /* KEY FIX */
+}
+
+.line{
+  white-space:pre-wrap;
+  word-break:break-all;
+  max-inline-size:100%;
 }
 
 /* ===== ERROR ===== */
@@ -168,24 +160,15 @@ pre{
 <main>
 
 <section class="section">
-<h2>What Is SQLMap?</h2>
-<p>
-SQLMap is an automated SQL injection tool used to detect and exploit database
-vulnerabilities. This lab runs SQLMap in a guarded mode to demonstrate how
-attacks work without causing harm.
-</p>
-</section>
-
-<section class="section">
 <h2>Run SQLMap (Safe Mode)</h2>
 
-<label>Target URL (must include parameter)</label>
+<label>Target URL</label>
 <input id="url"
-  value="http://testphp.vulnweb.com/listproducts.php?cat=1&id=2"
-  placeholder="http://testphp.vulnweb.com/listproducts.php?cat=1&id=2">
+  placeholder="Enter target URL (e.g., http://example.com/page.php?id=1)"
+  value="http://testphp.vulnweb.com/listproducts.php?cat=1&id=2">
 
-<label>Action</label>
-<select id="action" title="Select an action to perform with SQLMap">
+<label for="action">Action</label>
+<select id="action" name="action">
   <option value="">Detect Injection</option>
   <option value="--dbs">Enumerate Databases</option>
   <option value="--tables">Enumerate Tables</option>
@@ -199,8 +182,8 @@ attacks work without causing harm.
 <section class="section">
 <h2>Output</h2>
 
-<div class="output-wrapper">
-  <pre id="output">— waiting —</pre>
+<div class="output-grid">
+  <div class="terminal" id="terminal"></div>
 </div>
 
 <div id="err" class="error"></div>
@@ -210,11 +193,11 @@ attacks work without causing harm.
 
 <script>
 document.getElementById("run").onclick = async () => {
-  const out = document.getElementById("output");
+  const term = document.getElementById("terminal");
   const err = document.getElementById("err");
   const cmd = document.getElementById("cmd");
 
-  out.textContent = "Running…";
+  term.innerHTML = "";
   err.textContent = "";
 
   const url = document.getElementById("url").value.trim();
@@ -232,20 +215,26 @@ document.getElementById("run").onclick = async () => {
 
     const text = await res.text();
     let data;
-    try{ data = JSON.parse(text); }
-    catch{ data = {stderr:text}; }
+    try { data = JSON.parse(text); }
+    catch { data = {stderr:text}; }
+
+    const output = data.stdout || data.stderr || "No output";
+
+    output.split("\n").forEach(line=>{
+      const div = document.createElement("div");
+      div.className = "line";
+      div.textContent = line;
+      term.appendChild(div);
+    });
+
+    term.scrollTop = term.scrollHeight;
 
     if(!res.ok){
       err.textContent = data.detail || "Execution error";
-      out.textContent = "";
-      return;
     }
-
-    out.textContent = data.stdout || data.stderr || "No output";
   }
   catch{
     err.textContent = "Backend unreachable";
-    out.textContent = "";
   }
 };
 </script>
