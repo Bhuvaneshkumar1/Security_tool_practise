@@ -1,3 +1,5 @@
+/* ================= CANONICAL LESSON LIST ================= */
+/* THIS IS THE SINGLE SOURCE OF TRUTH */
 const REQUIRED_TOOLS = [
   "nmap",
   "sqlmap",
@@ -8,11 +10,11 @@ const REQUIRED_TOOLS = [
   "hydra"
 ];
 
-/* 👇 SET THIS MANUALLY PER PAGE */
+/* ================= CURRENT PAGE ================= */
 const LESSON_ID = document.body.dataset.lesson;
 
-/* ❌ Do nothing on home page */
-if (LESSON_ID) {
+/* ================= TRACK COMPLETION ================= */
+if (LESSON_ID && REQUIRED_TOOLS.includes(LESSON_ID)) {
 
   let completed = false;
 
@@ -25,6 +27,16 @@ if (LESSON_ID) {
       completed = true;
 
       localStorage.setItem(`lesson:${LESSON_ID}`, "done");
+
+      /* 🔎 DEBUG (keep for now) */
+      console.log("Completed:", LESSON_ID);
+      console.log(
+        "Progress:",
+        REQUIRED_TOOLS.map(t => ({
+          tool: t,
+          status: localStorage.getItem(`lesson:${t}`)
+        }))
+      );
 
       const allDone = REQUIRED_TOOLS.every(
         id => localStorage.getItem(`lesson:${id}`) === "done"
