@@ -3,106 +3,214 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SQLMap – Theory & Safe Practice</title>
+<title>SQLMap – SQL Injection Learning Lab</title>
 
 <style>
 :root{
-  --bg:#0b0f1a;--panel:#151c38;--fg:#e8ebff;--muted:#9aa3d1;
-  --accent:#22c55e;--border:#27306a;--code:#020617;--warn:#f59e0b;--err:#ef4444;
+  --bg:#0b0f1a;
+  --panel:#151c38;
+  --fg:#e8ebff;
+  --muted:#9aa3d1;
+  --accent:#22c55e;
+  --border:#27306a;
+  --code:#020617;
+  --error:#ef4444;
 }
+
 *{box-sizing:border-box}
-body{
-  margin:0;font-family:ui-monospace,Menlo,Consolas,monospace;
-  background:radial-gradient(1200px 600px at 20% -10%,#141b3a 0%,var(--bg) 60%);
-  color:var(--fg)
+
+html,body{
+  max-width:100%;
+  overflow-x:hidden;
 }
-header{padding:18px 24px;border-bottom:1px solid var(--border);background:#0b1024}
+
+body{
+  margin:0;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  background:radial-gradient(1200px 600px at 20% -10%,#141b3a 0%,var(--bg) 60%);
+  color:var(--fg);
+}
+
+header{
+  padding:18px 24px;
+  border-bottom:1px solid var(--border);
+  background:#0b1024;
+}
 header h1{margin:0;font-size:22px}
-main{max-width:1100px;margin:auto;padding:24px;display:grid;gap:20px}
-.section{background:linear-gradient(180deg,var(--panel),#0f1533);border:1px solid var(--border);border-radius:14px;padding:20px}
-label{display:block;margin-top:10px;color:var(--muted)}
-input,select,button{width:100%;margin-top:6px;padding:10px;border-radius:8px;border:1px solid var(--border);background:#060b20;color:var(--fg)}
-button{margin-top:14px;background:linear-gradient(135deg,#22c55e,#16a34a);border:none;font-weight:700;cursor:pointer}
-pre{background:#020617;border:1px solid #1e293b;border-radius:12px;padding:14px;height:260px;overflow:auto}
-.hidden{display:none}
+header small{color:var(--muted)}
+
+main{
+  max-width:1100px;
+  margin:auto;
+  padding:24px;
+}
+
+.section{
+  background:linear-gradient(180deg,var(--panel),#0f1533);
+  border:1px solid var(--border);
+  border-radius:14px;
+  margin-bottom:20px;
+  padding:22px;
+}
+
+.section h2{
+  margin:0 0 14px;
+  color:var(--accent);
+  font-size:18px;
+}
+
+.section p{
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.7;
+}
+
+label{
+  display:block;
+  font-size:13px;
+  margin-bottom:6px;
+  color:var(--muted);
+}
+
+input,select,button{
+  width:100%;
+  padding:10px;
+  border-radius:8px;
+  border:1px solid var(--border);
+  background:#020617;
+  color:var(--fg);
+  margin-bottom:12px;
+}
+
+button{
+  background:linear-gradient(135deg,#22c55e,#16a34a);
+  border:none;
+  font-weight:700;
+  cursor:pointer;
+}
+
+button:hover{opacity:.9}
+
+.command{
+  background:#020617;
+  border:1px solid #1e293b;
+  border-radius:10px;
+  padding:10px;
+  font-size:13px;
+  margin-top:10px;
+
+  white-space:pre-wrap;
+  word-break:break-all;
+}
+
+pre{
+  background:#020617;
+  border:1px solid #1e293b;
+  border-radius:12px;
+  padding:14px;
+  font-size:13px;
+
+  width:100%;
+  max-width:100%;
+  max-height:420px;
+
+  overflow-x:auto;
+  overflow-y:auto;
+
+  white-space:pre-wrap;
+  word-wrap:break-word;
+  overflow-wrap:anywhere;
+}
+
+.error{
+  color:var(--error);
+  font-size:13px;
+  margin-top:6px;
+}
 </style>
 </head>
 
 <body>
 
 <header>
-<h1>SQLMap</h1>
+  <h1>SQLMap</h1>
+  <small>SQL Injection automation — guided & safe execution</small>
 </header>
 
 <main>
 
 <section class="section">
+<h2>What Is SQLMap?</h2>
+<p>
+SQLMap is an automated SQL injection tool used to detect and exploit
+database vulnerabilities. This lab runs SQLMap in a guarded mode to
+demonstrate how attacks work without causing harm.
+</p>
+</section>
 
-<label>Target URL</label>
-<input id="url" placeholder="Enter target URL" value="http://testphp.vulnweb.com/listproducts.php?cat=1&id=2">
+<section class="section">
+<h2>Run SQLMap (Safe Mode)</h2>
 
-<label>Parameter</label>
-<select id="param" title="Select parameter to test">
-  <option value="">Auto</option>
-  <option value="cat">cat</option>
-  <option value="id">id</option>
+<label>Target URL (must include parameter)</label>
+<input id="url" placeholder="http://testphp.vulnweb.com/listproducts.php?cat=1&id=2"
+value="http://testphp.vulnweb.com/listproducts.php?cat=1&id=2">
+
+<label for="action">Action</label>
+<select id="action" title="Select an action to perform with SQLMap">
+  <option value="">Detect Injection</option>
+  <option value="--dbs">Enumerate Databases</option>
+  <option value="--tables">Enumerate Tables</option>
 </select>
-
-<label>Action</label>
-<select id="action" title="Select action to perform">
-  <option value="">Detection only</option>
-  <option value="--dbs">Enumerate databases</option>
-  <option value="--tables">Enumerate tables</option>
-</select>
-
-<label><input type="checkbox" id="waf"> Detect WAF</label>
 
 <button id="run">Run SQLMap</button>
 
-<h3>Command Executed</h3>
-<pre id="cmd">—</pre>
+<div class="command" id="cmd">— command will appear here —</div>
+</section>
 
-<h3>Output</h3>
-<pre id="out">—</pre>
-
-<button id="download" class="hidden">Download Report</button>
-
+<section class="section">
+<h2>Output</h2>
+<pre id="output">— waiting —</pre>
+<div id="err" class="error"></div>
 </section>
 
 </main>
 
 <script>
 document.getElementById("run").onclick = async () => {
-  const out = document.getElementById("out");
-  const cmdBox = document.getElementById("cmd");
-  const downloadBtn = document.getElementById("download");
+  const out = document.getElementById("output");
+  const err = document.getElementById("err");
+  const cmd = document.getElementById("cmd");
 
-  downloadBtn.classList.add("hidden");
-  out.textContent = "Running SQLMap…";
+  out.textContent = "Running…";
+  err.textContent = "";
 
-  const res = await fetch("/run/sqlmap", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-API-Key": "sqlmap-training-key"
-    },
-    body: JSON.stringify({
-      url: document.getElementById("url").value,
-      param: document.getElementById("param").value,
-      action: document.getElementById("action").value,
-      detect_waf: document.getElementById("waf").checked
-    })
-  });
+  const url = document.getElementById("url").value.trim();
+  const action = document.getElementById("action").value;
 
-  const data = await res.json();
-  cmdBox.textContent = data.command || "—";
-  out.textContent = data.stdout || data.stderr || "No output";
+  cmd.textContent = `sqlmap -u "${url}" ${action} --batch --level=1 --risk=1`;
 
-  if (data.report_id) {
-    downloadBtn.classList.remove("hidden");
-    downloadBtn.onclick = () => {
-      window.location = `/download/sqlmap/${data.report_id}`;
-    };
+  try{
+    const res = await fetch("/run/sqlmap",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({url,action})
+    });
+
+    const text = await res.text();
+    let data;
+    try{ data = JSON.parse(text); }catch{ data = {stderr:text}; }
+
+    if(!res.ok){
+      err.textContent = data.detail || "Execution error";
+      out.textContent = "";
+      return;
+    }
+
+    out.textContent = data.stdout || data.stderr || "No output";
+  }
+  catch{
+    err.textContent = "Backend unreachable";
+    out.textContent = "";
   }
 };
 </script>
