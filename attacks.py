@@ -29,7 +29,12 @@ def system_check():
 async def read_root():
     system_check()
     return FileResponse(
-        os.path.join(BASE_DIR, "security_features.html")
+        os.path.join(BASE_DIR, "security_features.html"),
+        headers={
+            "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+            "Pragma": "no-cache",
+            "Expires": "0"
+        }
     )
 
 # ---------------- NMAP ----------------
