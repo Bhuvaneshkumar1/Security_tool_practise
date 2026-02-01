@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hydra – Password Attack Theory</title>
+
+<style>
+:root{
+  --bg:#0b0f1a;
+  --panel:#151c38;
+  --fg:#e8ebff;
+  --muted:#9aa3d1;
+  --accent:#ff9f43;
+  --border:#27306a;
+  --code:#020617;
+  --good:#22c55e;
+  --bad:#ef4444;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  background:radial-gradient(1200px 600px at 20% -10%,#141b3a 0%,var(--bg) 60%);
+  color:var(--fg);
+}
+header{
+  padding:18px 24px;
+  border-bottom:1px solid var(--border);
+  background:#0b1024;
+}
+header h1{margin:0;font-size:22px}
+header small{color:var(--muted)}
+
+main{
+  max-width:1100px;
+  margin:auto;
+  padding:24px;
+}
+
+.section{
+  background:linear-gradient(180deg,var(--panel),#0f1533);
+  border:1px solid var(--border);
+  border-radius:14px;
+  margin-bottom:20px;
+  padding:22px;
+}
+
+.section h2{
+  margin:0 0 12px;
+  color:var(--accent);
+  font-size:18px;
+}
+
+.section h3{
+  margin:14px 0 6px;
+  color:#ffd166;
+  font-size:15px;
+}
+
+.section p,
+.section li{
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.7;
+}
+
+.section ul{margin-left:18px}
+
+.code{
+  background:linear-gradient(180deg,var(--code),#020617);
+  border:1px solid #1e293b;
+  border-radius:12px;
+  padding:14px;
+  margin-top:10px;
+  font-size:13px;
+  white-space:pre-wrap;
+}
+
+.tree{
+  background:#0a1028;
+  border:1px dashed var(--border);
+  border-radius:12px;
+  padding:14px;
+  margin-top:10px;
+  font-size:13px;
+}
+
+.yes{color:var(--good);font-weight:600}
+.no{color:var(--bad);font-weight:600}
+.arrow{color:var(--muted)}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Hydra</h1>
+  <small>Password attack tool — theory and responsible use</small>
+</header>
+
+<main>
+
+<section class="section">
+<h2>1. What Is Hydra?</h2>
+<p>
+Hydra (THC-Hydra) is a fast, parallelized login attack tool used to
+test authentication mechanisms across network services.
+</p>
+<ul>
+  <li>Used for password auditing</li>
+  <li>Supports many protocols</li>
+  <li>Extremely aggressive if misused</li>
+</ul>
+</section>
+
+<section class="section">
+<h2>2. What Hydra Is NOT</h2>
+<ul>
+  <li>Not a vulnerability scanner</li>
+  <li>Not an exploit framework</li>
+  <li>Not stealthy by default</li>
+</ul>
+<p>
+Hydra does not bypass authentication — it abuses weak credentials.
+</p>
+</section>
+
+<section class="section">
+<h2>3. How Hydra Works (Conceptual Flow)</h2>
+<div class="code">
+Usernames + Passwords
+        ↓
+Hydra generates login attempts
+        ↓
+Sends attempts to target service
+        ↓
+Monitors responses
+        ↓
+Valid credentials identified
+</div>
+</section>
+
+<section class="section">
+<h2>4. Authentication Services Hydra Targets</h2>
+<ul>
+  <li>SSH</li>
+  <li>FTP</li>
+  <li>HTTP / HTTPS (Basic, Form)</li>
+  <li>RDP</li>
+  <li>SMB</li>
+  <li>MySQL / PostgreSQL</li>
+</ul>
+</section>
+
+<section class="section">
+<h2>5. Attack Types Performed by Hydra</h2>
+<ul>
+  <li><b>Brute Force</b> – Try all combinations</li>
+  <li><b>Dictionary Attack</b> – Common passwords</li>
+  <li><b>Credential Stuffing</b> – Reused credentials</li>
+  <li><b>Username Enumeration</b> – Identify valid users</li>
+</ul>
+</section>
+
+<section class="section">
+<h2>6. Example Attack Walkthrough (Theory)</h2>
+
+<h3>Scenario</h3>
+<p>
+A server exposes SSH login with weak password policies.
+</p>
+
+<h3>Attacker prerequisites</h3>
+<ul>
+  <li>Known IP address</li>
+  <li>Valid username list</li>
+  <li>Password wordlist</li>
+</ul>
+
+<h3>Conceptual command flow</h3>
+<div class="code">
+hydra -l user -P passwords.txt ssh://target
+</div>
+
+<p>
+Hydra repeatedly attempts authentication until success or exhaustion.
+</p>
+</section>
+
+<section class="section">
+<h2>7. Why Hydra Is Dangerous</h2>
+<ul>
+  <li>Can generate thousands of login attempts per minute</li>
+  <li>Easily detected but still effective</li>
+  <li>Can cause account lockouts or service disruption</li>
+</ul>
+</section>
+
+<section class="section">
+<h2>8. How Organizations Detect Hydra Attacks</h2>
+<ul>
+  <li>Multiple failed login attempts</li>
+  <li>Unusual request rates</li>
+  <li>Authentication logs analysis</li>
+  <li>IDS / IPS alerts</li>
+</ul>
+</section>
+
+<section class="section">
+<h2>9. How Organizations Defend Against Hydra</h2>
+<ul>
+  <li>Strong password policies</li>
+  <li>Account lockout mechanisms</li>
+  <li>Rate limiting</li>
+  <li>Multi-factor authentication</li>
+  <li>IP reputation filtering</li>
+</ul>
+</section>
+
+<section class="section">
+<h2>10. When SHOULD You Use Hydra?</h2>
+<div class="tree">
+<p>Authorized penetration test?</p>
+<p class="arrow">↓</p>
+<p class="yes">YES</p>
+<ul>
+  <li>Internal security audits</li>
+  <li>CTF labs</li>
+  <li>Password policy validation</li>
+</ul>
+<p class="arrow">↓</p>
+<p class="yes">Hydra is acceptable</p>
+</div>
+</section>
+
+<section class="section">
+<h2>11. When SHOULD You NOT Use Hydra?</h2>
+<div class="tree">
+<p>Production or unauthorized target?</p>
+<p class="arrow">↓</p>
+<p class="no">YES</p>
+<ul>
+  <li>Live user systems</li>
+  <li>Public internet targets</li>
+  <li>Learning without permission</li>
+</ul>
+<p class="arrow">↓</p>
+<p class="no">Do NOT use Hydra</p>
+</div>
+</section>
+
+<section class="section">
+<h2>12. Hydra vs John the Ripper</h2>
+<ul>
+  <li>Hydra → Online attacks</li>
+  <li>John → Offline hash cracking</li>
+  <li>Both test weak authentication differently</li>
+</ul>
+</section>
+
+<section class="section">
+<h2>13. Interview-Ready Summary</h2>
+<p>
+Hydra is a fast, online password attack tool used to test authentication
+mechanisms. It does not exploit vulnerabilities but abuses weak or reused
+credentials. Due to its aggressive nature, it must only be used in
+authorized environments.
+</p>
+</section>
+
+</main>
+
+</body>
+</html>
