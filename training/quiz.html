@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Final Security Quiz</title>
+
+<style>
+:root{
+  --bg:#0b0f1a;
+  --panel:#151c38;
+  --fg:#e8ebff;
+  --muted:#9aa3d1;
+  --accent:#22c55e;
+  --fail:#ef4444;
+  --border:#27306a;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  background:radial-gradient(1200px 600px at 20% -10%,#141b3a 0%,var(--bg) 60%);
+  color:var(--fg);
+}
+main{
+  max-width:1100px;
+  margin:auto;
+  padding:24px;
+}
+.card{
+  background:linear-gradient(180deg,var(--panel),#0f1533);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:24px;
+}
+h1{margin-top:0;color:var(--accent)}
+.q{margin-bottom:18px}
+.q p{margin:0 0 6px;font-size:14px}
+label{display:block;font-size:13px;color:var(--muted)}
+button{
+  padding:14px 18px;
+  border-radius:12px;
+  border:none;
+  background:linear-gradient(135deg,#22c55e,#16a34a);
+  color:#020617;
+  font-weight:800;
+  cursor:pointer;
+}
+.result{margin-top:18px;font-size:16px;font-weight:800}
+.pass{color:var(--accent)}
+.fail{color:var(--fail)}
+</style>
+</head>
+
+<body>
+<main>
+<div class="card">
+<h1>Final Security Assessment</h1>
+<p>Answer all questions to validate your learning.</p>
+
+<div id="quiz"></div>
+
+<button onclick="submitQuiz()">Submit Quiz</button>
+<button id="certBtn" style="display:none;margin-left:10px;" onclick="downloadCert()">🎓 Download Certificate</button>
+
+<div id="result" class="result"></div>
+</div>
+</main>
+
+<script>
+const questions = [
+  {q:"What is Nmap primarily used for?",a:1,o:["Exploitation","Network scanning","Hash cracking","SQL injection"]},
+  {q:"SQL injection affects which layer?",a:2,o:["Network","Transport","Application","Kernel"]},
+  {q:"SQLMap automates which attack?",a:1,o:["XSS","SQL injection","DDoS","MITM"]},
+  {q:"Hydra performs which type of attack?",a:2,o:["Offline","Local","Online","Kernel"]},
+  {q:"John the Ripper is used for?",a:1,o:["Live login","Offline hash cracking","Port scanning","Sniffing"]},
+  {q:"Best defense against SQL injection?",a:3,o:["Firewall","IDS","WAF","Prepared statements"]},
+  {q:"Why are offline attacks dangerous?",a:3,o:["Slow","Logged","Blocked","No rate limit"]},
+  {q:"bcrypt is considered secure because?",a:2,o:["Fast","Reversible","Slow","Short"]},
+  {q:"Credential stuffing abuses?",a:2,o:["Brute force","Zero-days","Password reuse","Malware"]},
+  {q:"Metasploit is mainly a?",a:1,o:["Scanner","Framework","Cracker","Sniffer"]},
+  {q:"Weak passwords lead to?",a:0,o:["Account takeover","CPU spike","Routing issues","Packet loss"]},
+  {q:"Which tool is passive?",a:0,o:["Nmap -sn","Hydra","SQLMap","John"]},
+  {q:"MFA protects against?",a:1,o:["SQLi","Password compromise","XSS","Port scan"]},
+  {q:"Legal pentesting requires?",a:0,o:["Authorization","Proxy","Root","VPN"]},
+  {q:"Rate limiting prevents?",a:1,o:["SQLi","Brute force","XSS","MITM"]}
+];
+
+while(questions.length < 30){
+  questions.push(questions[questions.length % 15]);
+}
+
+const quiz = document.getElementById("quiz");
+questions.forEach((x,i)=>{
+  quiz.innerHTML += `
+  <div class="q">
+    <p>${i+1}. ${x.q}</p>
+    ${x.o.map((o,j)=>`
+      <label>
+        <input type="radio" name="q${i}" value="${j}"> ${o}
+      </label>`).join("")}
+  </div>`;
+});
+
+function submitQuiz(){
+  let score=0;
+  questions.forEach((q,i)=>{
+    const sel=document.querySelector(`input[name=q${i}]:checked`);
+    if(sel && parseInt(sel.value)===q.a) score++;
+  });
+
+  const res=document.getElementById("result");
+  if(score < 15){
+    res.textContent=`❌ Score ${score}/30 — Restart lessons and try again.`;
+    res.className="result fail";
+  }else{
+    res.textContent=`✅ Score ${score}/30 — Certified.`;
+    res.className="result pass";
+    document.getElementById("certBtn").style.display="inline-block";
+  }
+}
+
+function downloadCert(){
+  const date = new Date().toLocaleDateString();
+  const text = `
+CERTIFICATE OF COMPLETION
+
+This certifies that the learner has successfully
+completed the Security Tools Practice Lab
+and passed the final assessment.
+
+Date: ${date}
+
+— Security Practice Lab
+`;
+  const blob=new Blob([text],{type:"text/plain"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="certificate.txt";
+  a.click();
+}
+</script>
+</body>
+</html>

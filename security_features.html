@@ -139,6 +139,23 @@ footer{
 
 <header>
   <h1>SECURITY PRACTICE LAB</h1>
+  <div style="margin-bottom:18px;">
+  <div style="font-size:13px;color:#c7d2fe;margin-bottom:6px;">
+    Learning Progress
+  </div>
+  <div style="background:#111827;border-radius:10px;overflow:hidden;">
+    <div id="progressBar"
+         style="height:12px;width:0%;
+                background:linear-gradient(135deg,#22c55e,#16a34a);
+                transition:width .5s;">
+    </div>
+  </div>
+  <div id="progressText"
+       style="font-size:12px;color:#9aa3d1;margin-top:6px;">
+    0% completed
+  </div>
+</div>
+
   <p>Offensive security learning • safe simulations • theory-first</p>
 </header>
 
@@ -191,6 +208,48 @@ footer{
 </footer>
 
 </div>
+
+<button id="quizBtn"
+  style="
+    display:none;
+    margin-top:20px;
+    width:100%;
+    padding:14px;
+    border-radius:12px;
+    border:none;
+    font-weight:800;
+    background:linear-gradient(135deg,#22c55e,#16a34a);
+    color:#020617;
+    cursor:pointer;"
+  onclick="window.open('/quiz','_blank')">
+  🎓 Start Final Quiz
+</button>
+<script>
+const REQUIRED_TOOLS = [
+  "/nmap",
+  "/sqlmap",
+  "/netcat",
+  "/metasploit",
+  "/password_cracking",
+  "/john",
+  "/hydra"
+];
+
+const completed = REQUIRED_TOOLS.filter(
+  p => localStorage.getItem(`lesson:${p}`) === "done"
+).length;
+
+const percent = Math.round((completed / REQUIRED_TOOLS.length) * 100);
+
+document.getElementById("progressBar").style.width = percent + "%";
+document.getElementById("progressText").textContent =
+  `${percent}% completed`;
+
+if (percent === 100) {
+  document.getElementById("quizBtn").style.display = "block";
+}
+</script>
+
 
 </body>
 </html>
