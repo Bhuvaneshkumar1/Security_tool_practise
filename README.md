@@ -57,16 +57,27 @@ Using a virtual environment avoids dependency conflicts.
 ```bash
 python3 -m venv venv
 source venv/bin/activate
+```
 On Windows:
-
+```bash
 venv\Scripts\activate
+```
+On Linux/Mac
+```bash
+source venv/bin/activate
+```
 2️⃣ Install Dependencies
+```bash
 pip install -r requirements.txt
+```
 3️⃣ Run the Application
+```bash
 uvicorn attacks:app --reload
+```
 Open in browser:
-
+```bash
 http://127.0.0.1:8000
+```
 🔐 Security Principles
 No destructive commands
 
@@ -86,7 +97,7 @@ Built to demonstrate real understanding, not shortcuts.
 
 ---
 
-# 🚫 `.gitignore`  (FINAL)
+# 🚫 `.gitignore`
 
 ```gitignore
 # Python
