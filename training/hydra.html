@@ -52,12 +52,6 @@ main{
   font-size:18px;
 }
 
-.section h3{
-  margin:14px 0 6px;
-  color:#ffd166;
-  font-size:15px;
-}
-
 .section p,
 .section li{
   color:var(--muted);
@@ -76,19 +70,6 @@ main{
   font-size:13px;
   white-space:pre-wrap;
 }
-
-.tree{
-  background:#0a1028;
-  border:1px dashed var(--border);
-  border-radius:12px;
-  padding:14px;
-  margin-top:10px;
-  font-size:13px;
-}
-
-.yes{color:var(--good);font-weight:600}
-.no{color:var(--bad);font-weight:600}
-.arrow{color:var(--muted)}
 
 button{
   padding:12px 16px;
@@ -122,7 +103,7 @@ button:hover{opacity:.9}
 </style>
 </head>
 
-<body>
+<body data-lesson="hydra">
 
 <header>
   <h1>Hydra</h1>
@@ -131,147 +112,12 @@ button:hover{opacity:.9}
 
 <main>
 
-<!-- ===== EXISTING THEORY (UNCHANGED) ===== -->
-
 <section class="section">
-<h2>1. What Is Hydra?</h2>
-<p>
-Hydra (THC-Hydra) is a fast, parallelized login attack tool used to
-test authentication mechanisms across network services.
-</p>
-<ul>
-  <li>Used for password auditing</li>
-  <li>Supports many protocols</li>
-  <li>Extremely aggressive if misused</li>
-</ul>
-</section>
+<h2>Hydra Attack Flow Simulation (Safe)</h2>
 
-<section class="section">
-<h2>2. What Hydra Is NOT</h2>
-<ul>
-  <li>Not a vulnerability scanner</li>
-  <li>Not an exploit framework</li>
-  <li>Not stealthy by default</li>
-</ul>
-<p>
-Hydra does not bypass authentication — it abuses weak credentials.
-</p>
-</section>
-
-<section class="section">
-<h2>3. How Hydra Works (Conceptual Flow)</h2>
-<div class="code">
-Usernames + Passwords
-        ↓
-Hydra generates login attempts
-        ↓
-Sends attempts to target service
-        ↓
-Monitors responses
-        ↓
-Valid credentials identified
-</div>
-</section>
-
-<section class="section">
-<h2>4. Authentication Services Hydra Targets</h2>
-<ul>
-  <li>SSH</li>
-  <li>FTP</li>
-  <li>HTTP / HTTPS (Basic, Form)</li>
-  <li>RDP</li>
-  <li>SMB</li>
-  <li>MySQL / PostgreSQL</li>
-</ul>
-</section>
-
-<section class="section">
-<h2>5. Attack Types Performed by Hydra</h2>
-<ul>
-  <li><b>Brute Force</b> – Try all combinations</li>
-  <li><b>Dictionary Attack</b> – Common passwords</li>
-  <li><b>Credential Stuffing</b> – Reused credentials</li>
-  <li><b>Username Enumeration</b> – Identify valid users</li>
-</ul>
-</section>
-
-<section class="section">
-<h2>6. Example Attack Walkthrough (Theory)</h2>
-<h3>Scenario</h3>
-<p>A server exposes SSH login with weak password policies.</p>
-<h3>Conceptual command flow</h3>
-<div class="code">hydra -l user -P passwords.txt ssh://target</div>
-</section>
-
-<section class="section">
-<h2>7. Why Hydra Is Dangerous</h2>
-<ul>
-  <li>Thousands of attempts per minute</li>
-  <li>Account lockouts</li>
-  <li>Service disruption</li>
-</ul>
-</section>
-
-<section class="section">
-<h2>8. How Organizations Detect Hydra Attacks</h2>
-<ul>
-  <li>Failed login bursts</li>
-  <li>Rate anomalies</li>
-  <li>Authentication logs</li>
-</ul>
-</section>
-
-<section class="section">
-<h2>9. How Organizations Defend Against Hydra</h2>
-<ul>
-  <li>Strong passwords</li>
-  <li>Rate limiting</li>
-  <li>MFA</li>
-</ul>
-</section>
-
-<section class="section">
-<h2>10. When SHOULD You Use Hydra?</h2>
-<div class="tree">
-<p>Authorized test?</p>
-<p class="arrow">↓</p>
-<p class="yes">YES → Controlled environments only</p>
-</div>
-</section>
-
-<section class="section">
-<h2>11. When SHOULD You NOT Use Hydra?</h2>
-<div class="tree">
-<p>Production / no permission?</p>
-<p class="arrow">↓</p>
-<p class="no">YES → Never use Hydra</p>
-</div>
-</section>
-
-<section class="section">
-<h2>12. Hydra vs John the Ripper</h2>
-<ul>
-  <li>Hydra → Online attacks</li>
-  <li>John → Offline cracking</li>
-</ul>
-</section>
-
-<section class="section">
-<h2>13. Interview-Ready Summary</h2>
-<p>
-Hydra tests weak authentication by attempting passwords at scale.
-It must only be used in authorized environments.
-</p>
-</section>
-
-<!-- ===== NEW: SAFE SIMULATOR SECTION ===== -->
-
-<section class="section">
-<h2>14. Hydra Attack Flow Simulation (Safe)</h2>
-
-<button onclick="runSim('normal')">Normal Attack</button>
-<button onclick="runSim('ratelimit')">Rate-Limit Blocked</button>
-<button onclick="runSim('mfa')">MFA Blocked</button>
+<button onclick="simulate('normal')">Normal Attack</button>
+<button onclick="simulate('ratelimit')">Rate-Limit Blocked</button>
+<button onclick="simulate('mfa')">MFA Blocked</button>
 
 <div class="terminal" id="terminal">— waiting —</div>
 
@@ -284,28 +130,67 @@ Simulation only. No real authentication attempts are performed.
 
 <script>
 const terminal = document.getElementById("terminal");
-let socket;
 
-function runSim(mode){
+function simulate(mode){
   terminal.textContent = "";
-  if (socket) socket.close();
+  let steps = [];
 
-  socket = new WebSocket(`ws://${location.host}/ws/hydra/simulate/${mode}`);
+  if(mode === "normal"){
+    steps = [
+      "[INFO] Hydra v9.5",
+      "[INFO] Target: ssh://192.168.1.10",
+      "[INFO] Threads: 4",
+      "",
+      "[ATTEMPT] admin : admin123",
+      "[ATTEMPT] admin : password",
+      "[ATTEMPT] admin : letmein",
+      "",
+      "[SUCCESS] Valid credentials found!",
+      "[RESULT] admin : letmein",
+      "",
+      "[INFO] Attack completed"
+    ];
+  }
 
-  socket.onmessage = e => {
-    terminal.textContent += e.data + "\n";
+  if(mode === "ratelimit"){
+    steps = [
+      "[INFO] Hydra v9.5",
+      "[INFO] Target: ssh://192.168.1.10",
+      "",
+      "[ATTEMPT] admin : admin123",
+      "[ATTEMPT] admin : password",
+      "",
+      "[WARNING] Too many attempts detected",
+      "[BLOCKED] IP temporarily banned",
+      "",
+      "[INFO] Attack stopped by rate limiting"
+    ];
+  }
+
+  if(mode === "mfa"){
+    steps = [
+      "[INFO] Hydra v9.5",
+      "[INFO] Target: ssh://192.168.1.10",
+      "",
+      "[ATTEMPT] admin : letmein",
+      "[INFO] Password accepted",
+      "[MFA] One-time code required",
+      "",
+      "[FAILED] MFA challenge not solvable",
+      "[INFO] Attack ineffective against MFA"
+    ];
+  }
+
+  let i = 0;
+  const interval = setInterval(() => {
+    terminal.textContent += steps[i] + "\n";
     terminal.scrollTop = terminal.scrollHeight;
-  };
-
-  socket.onerror = () => {
-    terminal.textContent += "\n[ERROR] WebSocket error";
-  };
-
-  socket.onclose = () => {
-    terminal.textContent += "\n— simulation ended —";
-  };
+    i++;
+    if(i >= steps.length) clearInterval(interval);
+  }, 600);
 }
 </script>
+
 <script src="/static/lesson_tracker.js"></script>
 
 </body>
