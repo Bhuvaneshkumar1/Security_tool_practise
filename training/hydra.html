@@ -89,6 +89,36 @@ main{
 .yes{color:var(--good);font-weight:600}
 .no{color:var(--bad);font-weight:600}
 .arrow{color:var(--muted)}
+
+button{
+  padding:12px 16px;
+  border-radius:10px;
+  border:none;
+  background:linear-gradient(135deg,#22c55e,#16a34a);
+  color:#020617;
+  font-weight:700;
+  cursor:pointer;
+  margin-right:10px;
+}
+button:hover{opacity:.9}
+
+.terminal{
+  background:#020617;
+  border:1px solid #1e293b;
+  border-radius:12px;
+  padding:14px;
+  margin-top:12px;
+  font-size:13px;
+  height:280px;
+  overflow-y:auto;
+  white-space:pre-wrap;
+}
+
+.warn{
+  color:var(--bad);
+  font-size:12px;
+  margin-top:8px;
+}
 </style>
 </head>
 
@@ -100,6 +130,8 @@ main{
 </header>
 
 <main>
+
+<!-- ===== EXISTING THEORY (UNCHANGED) ===== -->
 
 <section class="section">
 <h2>1. What Is Hydra?</h2>
@@ -165,88 +197,54 @@ Valid credentials identified
 
 <section class="section">
 <h2>6. Example Attack Walkthrough (Theory)</h2>
-
 <h3>Scenario</h3>
-<p>
-A server exposes SSH login with weak password policies.
-</p>
-
-<h3>Attacker prerequisites</h3>
-<ul>
-  <li>Known IP address</li>
-  <li>Valid username list</li>
-  <li>Password wordlist</li>
-</ul>
-
+<p>A server exposes SSH login with weak password policies.</p>
 <h3>Conceptual command flow</h3>
-<div class="code">
-hydra -l user -P passwords.txt ssh://target
-</div>
-
-<p>
-Hydra repeatedly attempts authentication until success or exhaustion.
-</p>
+<div class="code">hydra -l user -P passwords.txt ssh://target</div>
 </section>
 
 <section class="section">
 <h2>7. Why Hydra Is Dangerous</h2>
 <ul>
-  <li>Can generate thousands of login attempts per minute</li>
-  <li>Easily detected but still effective</li>
-  <li>Can cause account lockouts or service disruption</li>
+  <li>Thousands of attempts per minute</li>
+  <li>Account lockouts</li>
+  <li>Service disruption</li>
 </ul>
 </section>
 
 <section class="section">
 <h2>8. How Organizations Detect Hydra Attacks</h2>
 <ul>
-  <li>Multiple failed login attempts</li>
-  <li>Unusual request rates</li>
-  <li>Authentication logs analysis</li>
-  <li>IDS / IPS alerts</li>
+  <li>Failed login bursts</li>
+  <li>Rate anomalies</li>
+  <li>Authentication logs</li>
 </ul>
 </section>
 
 <section class="section">
 <h2>9. How Organizations Defend Against Hydra</h2>
 <ul>
-  <li>Strong password policies</li>
-  <li>Account lockout mechanisms</li>
+  <li>Strong passwords</li>
   <li>Rate limiting</li>
-  <li>Multi-factor authentication</li>
-  <li>IP reputation filtering</li>
+  <li>MFA</li>
 </ul>
 </section>
 
 <section class="section">
 <h2>10. When SHOULD You Use Hydra?</h2>
 <div class="tree">
-<p>Authorized penetration test?</p>
+<p>Authorized test?</p>
 <p class="arrow">↓</p>
-<p class="yes">YES</p>
-<ul>
-  <li>Internal security audits</li>
-  <li>CTF labs</li>
-  <li>Password policy validation</li>
-</ul>
-<p class="arrow">↓</p>
-<p class="yes">Hydra is acceptable</p>
+<p class="yes">YES → Controlled environments only</p>
 </div>
 </section>
 
 <section class="section">
 <h2>11. When SHOULD You NOT Use Hydra?</h2>
 <div class="tree">
-<p>Production or unauthorized target?</p>
+<p>Production / no permission?</p>
 <p class="arrow">↓</p>
-<p class="no">YES</p>
-<ul>
-  <li>Live user systems</li>
-  <li>Public internet targets</li>
-  <li>Learning without permission</li>
-</ul>
-<p class="arrow">↓</p>
-<p class="no">Do NOT use Hydra</p>
+<p class="no">YES → Never use Hydra</p>
 </div>
 </section>
 
@@ -254,22 +252,60 @@ Hydra repeatedly attempts authentication until success or exhaustion.
 <h2>12. Hydra vs John the Ripper</h2>
 <ul>
   <li>Hydra → Online attacks</li>
-  <li>John → Offline hash cracking</li>
-  <li>Both test weak authentication differently</li>
+  <li>John → Offline cracking</li>
 </ul>
 </section>
 
 <section class="section">
 <h2>13. Interview-Ready Summary</h2>
 <p>
-Hydra is a fast, online password attack tool used to test authentication
-mechanisms. It does not exploit vulnerabilities but abuses weak or reused
-credentials. Due to its aggressive nature, it must only be used in
-authorized environments.
+Hydra tests weak authentication by attempting passwords at scale.
+It must only be used in authorized environments.
+</p>
+</section>
+
+<!-- ===== NEW: SAFE SIMULATOR SECTION ===== -->
+
+<section class="section">
+<h2>14. Hydra Attack Flow Simulation (Safe)</h2>
+
+<button onclick="runSim('normal')">Normal Attack</button>
+<button onclick="runSim('ratelimit')">Rate-Limit Blocked</button>
+<button onclick="runSim('mfa')">MFA Blocked</button>
+
+<div class="terminal" id="terminal">— waiting —</div>
+
+<p class="warn">
+Simulation only. No real authentication attempts are performed.
 </p>
 </section>
 
 </main>
+
+<script>
+const terminal = document.getElementById("terminal");
+let socket;
+
+function runSim(mode){
+  terminal.textContent = "";
+  if (socket) socket.close();
+
+  socket = new WebSocket(`ws://${location.host}/ws/hydra/simulate/${mode}`);
+
+  socket.onmessage = e => {
+    terminal.textContent += e.data + "\n";
+    terminal.scrollTop = terminal.scrollHeight;
+  };
+
+  socket.onerror = () => {
+    terminal.textContent += "\n[ERROR] WebSocket error";
+  };
+
+  socket.onclose = () => {
+    terminal.textContent += "\n— simulation ended —";
+  };
+}
+</script>
 
 </body>
 </html>
