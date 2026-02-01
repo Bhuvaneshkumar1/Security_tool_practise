@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Metasploit – Complete Theory</title>
+
+<style>
+:root{
+  --bg:#0b0f1a;
+  --panel:#151c38;
+  --fg:#e8ebff;
+  --muted:#9aa3d1;
+  --accent:#ff9f43;
+  --border:#27306a;
+  --code:#020617;
+  --good:#22c55e;
+  --bad:#ef4444;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  background:radial-gradient(1200px 600px at 20% -10%,#141b3a 0%,var(--bg) 60%);
+  color:var(--fg);
+}
+header{
+  padding:18px 24px;
+  border-bottom:1px solid var(--border);
+  background:#0b1024;
+}
+header h1{margin:0;font-size:22px}
+header small{color:var(--muted)}
+
+main{
+  max-width:1100px;
+  margin:auto;
+  padding:24px;
+}
+
+.section{
+  background:linear-gradient(180deg,var(--panel),#0f1533);
+  border:1px solid var(--border);
+  border-radius:14px;
+  margin-bottom:20px;
+  padding:22px;
+}
+
+.section h2{
+  margin:0 0 12px;
+  color:var(--accent);
+  font-size:18px;
+}
+
+.section h3{
+  margin:14px 0 6px;
+  color:#ffd166;
+  font-size:15px;
+}
+
+.section p,
+.section li{
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.7;
+}
+
+.section ul{
+  margin:8px 0 0 18px;
+}
+
+.code{
+  background:linear-gradient(180deg,var(--code),#020617);
+  border:1px solid #1e293b;
+  border-radius:12px;
+  padding:14px;
+  margin-top:10px;
+  font-size:13px;
+  white-space:pre-wrap;
+}
+
+.tree{
+  background:#0a1028;
+  border:1px dashed var(--border);
+  border-radius:12px;
+  padding:14px;
+  margin-top:10px;
+  font-size:13px;
+}
+
+.yes{color:var(--good);font-weight:600}
+.no{color:var(--bad);font-weight:600}
+.arrow{color:var(--muted)}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Metasploit Framework</h1>
+  <small>Complete theoretical understanding of exploitation frameworks</small>
+</header>
+
+<main>
+
+<section class="section">
+<h2>1. What is Metasploit?</h2>
+<p>
+Metasploit is a penetration testing framework used to identify,
+exploit, and validate vulnerabilities in systems and applications.
+</p>
+<ul>
+  <li>Used by penetration testers, red teams, and attackers</li>
+  <li>Maintained by Rapid7</li>
+  <li>Highly modular and extensible</li>
+</ul>
+</section>
+
+<section class="section">
+<h2>2. Why Metasploit Is Dangerous</h2>
+<ul>
+  <li>Can spawn shells</li>
+  <li>Can execute arbitrary payloads</li>
+  <li>Can crash systems</li>
+  <li>Can bypass defenses if misused</li>
+</ul>
+<p>
+Because of this, Metasploit must only be used in authorized environments.
+</p>
+</section>
+
+<section class="section">
+<h2>3. High-Level Architecture</h2>
+<div class="code">
+User → msfconsole → Module → Payload → Target → Session
+</div>
+<p>
+Each step introduces state and risk.
+</p>
+</section>
+
+<section class="section">
+<h2>4. Metasploit Console (msfconsole)</h2>
+<p>
+<code>msfconsole</code> is the interactive interface used to control Metasploit.
+</p>
+<ul>
+  <li>Loads modules</li>
+  <li>Maintains sessions</li>
+  <li>Controls payload execution</li>
+</ul>
+</section>
+
+<section class="section">
+<h2>5. Metasploit Module Types</h2>
+
+<h3>Exploit</h3>
+<p>Triggers a specific vulnerability.</p>
+
+<h3>Payload</h3>
+<p>Executed after successful exploitation.</p>
+
+<h3>Auxiliary</h3>
+<p>Scanners, fuzzers, brute-force tools.</p>
+
+<h3>Post</h3>
+<p>Used after exploitation (enumeration, persistence).</p>
+
+<h3>Encoder</h3>
+<p>Obfuscates payloads to evade detection.</p>
+
+<h3>NOP</h3>
+<p>Payload padding for memory alignment.</p>
+</section>
+
+<section class="section">
+<h2>6. Exploit Workflow (Theory)</h2>
+<div class="code">
+1. Scan target
+2. Identify vulnerability
+3. Select exploit
+4. Configure options
+5. Select payload
+6. Execute
+7. Manage session
+</div>
+</section>
+
+<section class="section">
+<h2>7. Example Exploit Walkthrough (Theory)</h2>
+
+<h3>Scenario</h3>
+<p>FTP service running vsftpd 2.3.4</p>
+
+<h3>Identify vulnerability</h3>
+<div class="code">
+21/tcp open ftp vsftpd 2.3.4
+</div>
+
+<h3>Select exploit</h3>
+<div class="code">
+use exploit/unix/ftp/vsftpd_234_backdoor
+</div>
+
+<h3>Configure target</h3>
+<div class="code">
+set RHOSTS 10.10.10.3
+</div>
+
+<h3>Select payload</h3>
+<p>Defines access method (shell, meterpreter).</p>
+
+<h3>Execute (concept)</h3>
+<div class="code">
+run
+</div>
+
+<h3>Session opened</h3>
+<p>Represents control over the target.</p>
+</section>
+
+<section class="section">
+<h2>8. Sessions Explained</h2>
+<ul>
+  <li>Shell sessions</li>
+  <li>Meterpreter sessions</li>
+</ul>
+<p>
+Sessions are persistent and powerful — this is why execution is restricted.
+</p>
+</section>
+
+<section class="section">
+<h2>9. Payload Concepts</h2>
+<ul>
+  <li>Reverse shell</li>
+  <li>Bind shell</li>
+  <li>Staged vs stageless</li>
+</ul>
+</section>
+
+<section class="section">
+<h2>10. Auxiliary Modules</h2>
+<p>
+Auxiliary modules perform:
+</p>
+<ul>
+  <li>Scanning</li>
+  <li>Service enumeration</li>
+  <li>Credential brute forcing</li>
+</ul>
+</section>
+
+<section class="section">
+<h2>11. Post-Exploitation</h2>
+<ul>
+  <li>Privilege escalation</li>
+  <li>Credential dumping</li>
+  <li>Persistence</li>
+</ul>
+</section>
+
+<section class="section">
+<h2>12. When SHOULD You Use Metasploit?</h2>
+<div class="tree">
+<p>Authorized environment?</p>
+<p class="arrow">↓</p>
+<p class="yes">YES → Use Metasploit</p>
+</div>
+</section>
+
+<section class="section">
+<h2>13. When SHOULD You NOT Use Metasploit?</h2>
+<div class="tree">
+<p>Production or unauthorized?</p>
+<p class="arrow">↓</p>
+<p class="no">YES → Do NOT use Metasploit</p>
+</div>
+</section>
+
+<section class="section">
+<h2>14. Metasploit vs Manual Exploitation</h2>
+<ul>
+  <li>Metasploit: fast, noisy</li>
+  <li>Manual: precise, stealthy</li>
+</ul>
+</section>
+
+<section class="section">
+<h2>15. Interview-Ready Summary</h2>
+<p>
+Metasploit is a modular exploitation framework that automates
+vulnerability exploitation and post-exploitation tasks.
+Due to its power, it must be used only in authorized environments
+and is best understood conceptually before execution.
+</p>
+</section>
+
+</main>
+
+</body>
+</html>
