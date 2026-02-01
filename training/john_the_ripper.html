@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>John the Ripper – Offline Hash Cracking Theory & Simulation</title>
+
+<style>
+:root{
+  --bg:#0b0f1a;
+  --panel:#151c38;
+  --fg:#e8ebff;
+  --muted:#9aa3d1;
+  --accent:#60a5fa;
+  --border:#27306a;
+  --code:#020617;
+  --good:#22c55e;
+  --bad:#ef4444;
+  --warn:#f59e0b;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  background:radial-gradient(1200px 600px at 20% -10%,#141b3a 0%,var(--bg) 60%);
+  color:var(--fg);
+}
+header{
+  padding:18px 24px;
+  border-bottom:1px solid var(--border);
+  background:#0b1024;
+}
+header h1{margin:0;font-size:22px}
+header small{color:var(--muted)}
+
+main{
+  max-width:1100px;
+  margin:auto;
+  padding:24px;
+}
+
+.section{
+  background:linear-gradient(180deg,var(--panel),#0f1533);
+  border:1px solid var(--border);
+  border-radius:14px;
+  margin-bottom:20px;
+  padding:22px;
+}
+
+.section h2{
+  margin:0 0 14px;
+  color:var(--accent);
+  font-size:18px;
+}
+
+.section p,
+.section li{
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.7;
+}
+
+.hash{
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:14px;
+  margin-bottom:12px;
+  background:#0a1028;
+  cursor:pointer;
+}
+.hash h3{margin:0;color:#93c5fd;font-size:15px}
+
+.details{display:none;margin-top:10px;font-size:13px}
+.details ul{margin-left:18px}
+
+.fast{color:var(--bad)}
+.medium{color:var(--warn)}
+.slow{color:var(--good)}
+
+button{
+  padding:12px 16px;
+  border-radius:10px;
+  border:none;
+  background:linear-gradient(135deg,#22c55e,#16a34a);
+  color:#020617;
+  font-weight:700;
+  cursor:pointer;
+  margin-right:10px;
+}
+
+button.secondary{
+  background:linear-gradient(135deg,#3b82f6,#2563eb);
+}
+
+button:hover{opacity:.9}
+
+.terminal{
+  background:#020617;
+  border:1px solid #1e293b;
+  border-radius:12px;
+  padding:14px;
+  font-size:13px;
+  height:280px;
+  overflow-y:auto;
+  white-space:pre-wrap;
+  margin-top:12px;
+}
+
+.warn{
+  font-size:12px;
+  color:var(--bad);
+  margin-top:8px;
+}
+
+/* TIMELINE */
+.timeline{
+  border-left:3px solid var(--accent);
+  padding-left:20px;
+}
+.event{
+  margin-bottom:20px;
+  position:relative;
+}
+.event::before{
+  content:"";
+  position:absolute;
+  left:-11px;
+  top:4px;
+  width:14px;
+  height:14px;
+  background:var(--accent);
+  border-radius:50%;
+}
+.event h3{
+  margin:0;
+  color:#93c5fd;
+  font-size:15px;
+}
+.event p{
+  margin:6px 0 0;
+  font-size:13px;
+  color:var(--muted);
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>John the Ripper</h1>
+  <small>Offline hash cracking — theory & safe simulation</small>
+</header>
+
+<main>
+
+<section class="section">
+<h2>What Is John the Ripper?</h2>
+<p>
+John the Ripper is an offline password cracking tool that attempts to recover
+plaintext passwords from password hashes after a breach.
+</p>
+</section>
+
+<section class="section">
+<h2>Common Hash Types John Cracks</h2>
+
+<div class="hash" onclick="toggle(this)">
+<h3>MD5</h3>
+<div class="details">
+<ul>
+<li><b>Size:</b> 128-bit</li>
+<li><b>Speed:</b> <span class="fast">Extremely fast</span></li>
+<li><b>Crack time:</b> Seconds–minutes</li>
+</ul>
+</div>
+</div>
+
+<div class="hash" onclick="toggle(this)">
+<h3>SHA-1</h3>
+<div class="details">
+<ul>
+<li><b>Size:</b> 160-bit</li>
+<li><b>Speed:</b> <span class="fast">Very fast</span></li>
+<li><b>Crack time:</b> Minutes–hours</li>
+</ul>
+</div>
+</div>
+
+<div class="hash" onclick="toggle(this)">
+<h3>SHA-256 / SHA-512</h3>
+<div class="details">
+<ul>
+<li><b>Speed:</b> <span class="medium">Fast</span></li>
+<li><b>Crack time:</b> Hours–days</li>
+</ul>
+</div>
+</div>
+
+<div class="hash" onclick="toggle(this)">
+<h3>NTLM</h3>
+<div class="details">
+<ul>
+<li><b>Used by:</b> Windows</li>
+<li><b>Speed:</b> <span class="fast">Extremely fast</span></li>
+<li><b>Crack time:</b> Seconds</li>
+</ul>
+</div>
+</div>
+
+<div class="hash" onclick="toggle(this)">
+<h3>bcrypt</h3>
+<div class="details">
+<ul>
+<li><b>Speed:</b> <span class="slow">Very slow</span></li>
+<li><b>Crack time:</b> Months–years</li>
+</ul>
+</div>
+</div>
+</section>
+
+<section class="section">
+<h2>Real-World Breach Timeline (Offline Cracking Impact)</h2>
+
+<div class="timeline">
+
+<div class="event">
+<h3>2009 – RockYou</h3>
+<p>
+Passwords stored in plaintext. Massive dataset later used with John
+to crack millions of reused passwords across other services.
+</p>
+</div>
+
+<div class="event">
+<h3>2012 – LinkedIn</h3>
+<p>
+Unsalted SHA-1 hashes. Offline cracking recovered over 100 million
+passwords within days.
+</p>
+</div>
+
+<div class="event">
+<h3>2013 – Adobe</h3>
+<p>
+Weak encryption and password hints allowed rule-based cracking
+using John-style attacks.
+</p>
+</div>
+
+<div class="event">
+<h3>2013–2014 – Yahoo</h3>
+<p>
+MD5 hashing enabled long-term offline cracking and account takeovers.
+</p>
+</div>
+
+<div class="event">
+<h3>2015 – Ashley Madison</h3>
+<p>
+bcrypt used, but weak passwords and low cost factors still allowed
+partial cracking.
+</p>
+</div>
+
+</div>
+</section>
+
+<section class="section">
+<h2>John the Ripper – Offline Cracking Simulation</h2>
+
+<button onclick="simulate('md5')">Simulate MD5 Crack</button>
+<button class="secondary" onclick="simulate('bcrypt')">Simulate bcrypt Crack</button>
+
+<div class="terminal" id="terminal">— waiting —</div>
+
+<p class="warn">Simulation only. No real hashes are cracked.</p>
+</section>
+
+</main>
+
+<script>
+function toggle(el){
+  const d = el.querySelector(".details");
+  d.style.display = d.style.display === "block" ? "none" : "block";
+}
+
+const terminal = document.getElementById("terminal");
+
+function simulate(type){
+  terminal.textContent = "";
+  let steps;
+
+  if(type === "md5"){
+    steps = [
+      "[INFO] John the Ripper 1.9.0",
+      "[INFO] Loaded 1 password hash (MD5 [128/128 AVX2 4x])",
+      "[INFO] Hash type: MD5",
+      "[INFO] Started billions guesses/sec ",
+      "[INFO] guessing passwords.",
+      "",
+      "[INFO] guessing passwords..",
+      "",
+      "[INFO] guessing passwords...",
+      "[CRACKED] password: 123456",
+      "[INFO] Done in 0.5 seconds"
+    ];
+  } else {
+    steps = [
+      "[INFO] John the Ripper 1.9.0",
+      "[INFO] Loaded 1 password hash (bcrypt [Blowfish 32/64 X3])",
+      "[INFO] Hash type: bcrypt",
+      "[INFO] Started 1000 guesses/sec ",
+      "[INFO] guessing passwords.",
+      "",
+      "[INFO] guessing passwords..",
+      "",
+      "[INFO] guessing passwords...",
+      "[STATUS] Still running...",
+      "[INFO] Estimated time: months–years"
+    ];
+  }
+
+  let i = 0;
+  const interval = setInterval(() => {
+    terminal.textContent += steps[i] + "\n";
+    terminal.scrollTop = terminal.scrollHeight;
+    i++;
+    if(i >= steps.length) clearInterval(interval);
+  }, 600);
+}
+</script>
+
+</body>
+</html>
