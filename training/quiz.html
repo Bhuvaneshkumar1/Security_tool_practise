@@ -2,143 +2,193 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Final Security Quiz</title>
 
 <style>
 :root{
   --bg:#0b0f1a;
-  --panel:#151c38;
-  --fg:#e8ebff;
-  --muted:#9aa3d1;
+  --panel:#111827;
+  --border:#1f2937;
+  --fg:#e5e7eb;
+  --muted:#9ca3af;
   --accent:#22c55e;
-  --fail:#ef4444;
-  --border:#27306a;
+  --danger:#ef4444;
 }
-*{box-sizing:border-box}
-body{
+*{
+  box-sizing:border-box;
   margin:0;
-  font-family: ui-monospace, Menlo, Consolas, monospace;
-  background:radial-gradient(1200px 600px at 20% -10%,#141b3a 0%,var(--bg) 60%);
+  padding:0;
+  font-family:Inter,system-ui,sans-serif;
+}
+body{
+  min-height:100vh;
+  background:var(--bg);
   color:var(--fg);
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  padding:30px;
 }
-main{
-  max-width:1100px;
-  margin:auto;
-  padding:24px;
-}
-.card{
-  background:linear-gradient(180deg,var(--panel),#0f1533);
+.container{
+  max-width:900px;
+  width:100%;
+  background:linear-gradient(180deg,#0f172a,#020617);
   border:1px solid var(--border);
-  border-radius:16px;
-  padding:24px;
+  border-radius:18px;
+  padding:30px;
 }
-h1{margin-top:0;color:var(--accent)}
-.q{margin-bottom:18px}
-.q p{margin:0 0 6px;font-size:14px}
-label{display:block;font-size:13px;color:var(--muted)}
+h1{
+  text-align:center;
+  margin-bottom:10px;
+}
+.subtitle{
+  text-align:center;
+  font-size:13px;
+  color:var(--muted);
+  margin-bottom:30px;
+}
+.question{
+  margin-bottom:22px;
+}
+.question h3{
+  font-size:15px;
+  margin-bottom:10px;
+}
+.options label{
+  display:block;
+  padding:10px 12px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  margin-bottom:8px;
+  cursor:pointer;
+  transition:.2s;
+}
+.options input{
+  margin-right:8px;
+}
+.options label:hover{
+  border-color:var(--accent);
+}
 button{
-  padding:14px 18px;
-  border-radius:12px;
+  width:100%;
+  margin-top:25px;
+  padding:14px;
+  font-size:16px;
+  font-weight:800;
   border:none;
+  border-radius:14px;
+  cursor:pointer;
   background:linear-gradient(135deg,#22c55e,#16a34a);
   color:#020617;
-  font-weight:800;
-  cursor:pointer;
 }
-.result{margin-top:18px;font-size:16px;font-weight:800}
-.pass{color:var(--accent)}
-.fail{color:var(--fail)}
+.result{
+  margin-top:30px;
+  padding:20px;
+  border-radius:14px;
+  text-align:center;
+}
+.pass{
+  background:#052e1a;
+  border:1px solid #14532d;
+}
+.fail{
+  background:#3f1d1d;
+  border:1px solid #7f1d1d;
+}
 </style>
 </head>
 
 <body>
-<main>
-<div class="card">
-<h1>Final Security Assessment</h1>
-<p>Answer all questions to validate your learning.</p>
 
-<div id="quiz"></div>
+<div class="container">
+<h1>Final Security Quiz</h1>
+<div class="subtitle">
+30 questions • Pass mark: 15 • Theory & simulations based
+</div>
+
+<form id="quizForm"></form>
 
 <button onclick="submitQuiz()">Submit Quiz</button>
-<button id="certBtn" style="display:none;margin-left:10px;" onclick="downloadCert()">🎓 Download Certificate</button>
 
-<div id="result" class="result"></div>
+<div id="result"></div>
 </div>
-</main>
 
 <script>
 const questions = [
-  {q:"What is Nmap primarily used for?",a:1,o:["Exploitation","Network scanning","Hash cracking","SQL injection"]},
-  {q:"SQL injection affects which layer?",a:2,o:["Network","Transport","Application","Kernel"]},
-  {q:"SQLMap automates which attack?",a:1,o:["XSS","SQL injection","DDoS","MITM"]},
-  {q:"Hydra performs which type of attack?",a:2,o:["Offline","Local","Online","Kernel"]},
-  {q:"John the Ripper is used for?",a:1,o:["Live login","Offline hash cracking","Port scanning","Sniffing"]},
-  {q:"Best defense against SQL injection?",a:3,o:["Firewall","IDS","WAF","Prepared statements"]},
-  {q:"Why are offline attacks dangerous?",a:3,o:["Slow","Logged","Blocked","No rate limit"]},
-  {q:"bcrypt is considered secure because?",a:2,o:["Fast","Reversible","Slow","Short"]},
-  {q:"Credential stuffing abuses?",a:2,o:["Brute force","Zero-days","Password reuse","Malware"]},
-  {q:"Metasploit is mainly a?",a:1,o:["Scanner","Framework","Cracker","Sniffer"]},
-  {q:"Weak passwords lead to?",a:0,o:["Account takeover","CPU spike","Routing issues","Packet loss"]},
-  {q:"Which tool is passive?",a:0,o:["Nmap -sn","Hydra","SQLMap","John"]},
-  {q:"MFA protects against?",a:1,o:["SQLi","Password compromise","XSS","Port scan"]},
-  {q:"Legal pentesting requires?",a:0,o:["Authorization","Proxy","Root","VPN"]},
-  {q:"Rate limiting prevents?",a:1,o:["SQLi","Brute force","XSS","MITM"]}
+  {q:"What is the primary purpose of Nmap?",o:["Exploit systems","Crack passwords","Network discovery and enumeration","Bypass firewalls"],a:2},
+  {q:"Which Nmap flag enables service version detection?",o:["-O","-sC","-sV","-Pn"],a:2},
+  {q:"What does Nmap -O attempt to identify?",o:["Open ports","Operating system","Vulnerabilities","Firewalls"],a:1},
+  {q:"Why is unauthorized scanning illegal?",o:["Consumes bandwidth","Exposes IPs","Unauthorized reconnaissance","Slow networks"],a:2},
+  {q:"Netcat is commonly called the?",o:["Exploit engine","Port scanner","Swiss army knife of networking","Password cracker"],a:2},
+  {q:"Why is Netcat simulated in this lab?",o:["Too slow","Needs GUI","Can create unsafe listeners","Deprecated"],a:2},
+  {q:"Hydra performs which type of attack?",o:["Offline cracking","SQL injection","Online password attacks","Memory exploitation"],a:2},
+  {q:"Why is Hydra dangerous?",o:["Kernel exploits","Mass login attempts","Encryption bypass","Binary modification"],a:1},
+  {q:"Which defense best blocks Hydra?",o:["Strong passwords","Firewall","MFA","Antivirus"],a:2},
+  {q:"Rate limiting protects against?",o:["XSS","Brute force","Malware","Privilege escalation"],a:1},
+  {q:"John the Ripper is used for?",o:["Live attacks","Exploitation","Offline hash cracking","Scanning"],a:2},
+  {q:"Why are offline attacks dangerous?",o:["Need admin","No rate limits","Need exploits","Hardware dependent"],a:1},
+  {q:"Which hash is weakest?",o:["bcrypt","Argon2","MD5","PBKDF2"],a:2},
+  {q:"Why is bcrypt secure?",o:["Encrypted","Cost factor + salt","Proprietary","Blocks GPU"],a:1},
+  {q:"SQLMap automates?",o:["Password attacks","Network scanning","SQL injection","Exploitation"],a:2},
+  {q:"Why is SQLMap restricted here?",o:["Unstable","Licensed","Can damage databases","Slow"],a:2},
+  {q:"SQL injection exploits?",o:["Weak passwords","Bad input validation","Open ports","Missing patches"],a:1},
+  {q:"Security testing must be?",o:["Stealthy","Fast","Authorized","Anonymous"],a:2},
+  {q:"Credential stuffing uses?",o:["Generated passwords","Reused breaches","Hash cracking","Phishing"],a:1},
+  {q:"Best defense vs credential stuffing?",o:["Hashing","MFA","Port block","Encryption"],a:1},
+  {q:"Scrolling to bottom does what?",o:["Runs tool","Marks lesson complete","Starts quiz","Deletes data"],a:1},
+  {q:"Why simulate dangerous tools?",o:["Speed","Browser limits","Safety & ethics","Complexity"],a:2},
+  {q:"Final quiz purpose?",o:["Fun","Certificate","Validate learning","Unlock tools"],a:2},
+  {q:"Quiz unlocks at?",o:["Login","50%","100%","Anytime"],a:2},
+  {q:"Completed badge means?",o:["Tool run","Lesson viewed","Quiz passed","Cert issued"],a:1},
+  {q:"MFA works because?",o:["Blocks IPs","Extra factor","Encrypts","Hides users"],a:1},
+  {q:"Credential reuse attack?",o:["XSS","Stuffing","Scanning","Injection"],a:1},
+  {q:"Ethical hacker duty?",o:["Avoid logs","Report responsibly","Exploit fully","Hide traces"],a:1},
+  {q:"Why learn theory first?",o:["Save time","Avoid blind misuse","Speed attacks","Skip coding"],a:1},
+  {q:"This lab demonstrates?",o:["Tool mastery","Ethical security understanding","Exploitation","Network takeover"],a:1}
 ];
 
-while(questions.length < 30){
-  questions.push(questions[questions.length % 15]);
-}
+const form = document.getElementById("quizForm");
 
-const quiz = document.getElementById("quiz");
-questions.forEach((x,i)=>{
-  quiz.innerHTML += `
-  <div class="q">
-    <p>${i+1}. ${x.q}</p>
-    ${x.o.map((o,j)=>`
+questions.forEach((q,i)=>{
+  const div=document.createElement("div");
+  div.className="question";
+  div.innerHTML=`<h3>${i+1}. ${q.q}</h3>`;
+  const opts=document.createElement("div");
+  opts.className="options";
+  q.o.forEach((opt,idx)=>{
+    opts.innerHTML+=`
       <label>
-        <input type="radio" name="q${i}" value="${j}"> ${o}
-      </label>`).join("")}
-  </div>`;
+        <input type="radio" name="q${i}" value="${idx}">
+        ${opt}
+      </label>`;
+  });
+  div.appendChild(opts);
+  form.appendChild(div);
 });
 
 function submitQuiz(){
   let score=0;
   questions.forEach((q,i)=>{
-    const sel=document.querySelector(`input[name=q${i}]:checked`);
+    const sel=document.querySelector(`input[name="q${i}"]:checked`);
     if(sel && parseInt(sel.value)===q.a) score++;
   });
 
   const res=document.getElementById("result");
-  if(score < 15){
-    res.textContent=`❌ Score ${score}/30 — Restart lessons and try again.`;
-    res.className="result fail";
-  }else{
-    res.textContent=`✅ Score ${score}/30 — Certified.`;
+  if(score>=15){
     res.className="result pass";
-    document.getElementById("certBtn").style.display="inline-block";
+    res.innerHTML=`<h2>✅ Passed</h2>
+    <p>You scored <b>${score}/30</b></p>
+    <p>Excellent understanding of ethical security concepts.</p>`;
+  }else{
+    res.className="result fail";
+    res.innerHTML=`<h2>❌ Not Passed</h2>
+    <p>You scored <b>${score}/30</b></p>
+    <p>Please revisit the lessons and try again.</p>`;
   }
-}
-
-function downloadCert(){
-  const date = new Date().toLocaleDateString();
-  const text = `
-CERTIFICATE OF COMPLETION
-
-This certifies that the learner has successfully
-completed the Security Tools Practice Lab
-and passed the final assessment.
-
-Date: ${date}
-
-— Security Practice Lab
-`;
-  const blob=new Blob([text],{type:"text/plain"});
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download="certificate.txt";
-  a.click();
+  window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"});
 }
 </script>
+
 </body>
 </html>
