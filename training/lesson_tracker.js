@@ -1,14 +1,13 @@
 /* ================= CANONICAL LESSON LIST ================= */
 /* THIS IS THE SINGLE SOURCE OF TRUTH */
 const REQUIRED_TOOLS = [
-  "nmap",
-  "sqlmap",
-  "netcat",
-  "metasploit",
-  "password_cracking",
-  "john",
-  "hydra"
+  "reconnaissance",      // nmap
+  "enumeration",         // netcat
+  "exploitation",        // sqlmap + metasploit
+  "credential_attacks",  // hydra + john
+  "password_cracking"
 ];
+
 
 /* ================= CURRENT PAGE ================= */
 const LESSON_ID = document.body.dataset.lesson;

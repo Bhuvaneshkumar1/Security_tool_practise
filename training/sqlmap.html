@@ -3,241 +3,275 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SQLMap – SQL Injection Learning Lab</title>
+<title>Exploitation Awareness</title>
 
 <style>
-/* ===== HARD PAGE LOCK ===== */
-html, body {
-  width: 100%;
-  max-width: 100%;
-  overflow-x: hidden !important;
-}
-
-/* ===== THEME ===== */
 :root{
   --bg:#0b0f1a;
-  --panel:#151c38;
-  --fg:#e8ebff;
-  --muted:#9aa3d1;
-  --accent:#22c55e;
-  --border:#27306a;
-  --error:#ef4444;
+  --panel:#111827;
+  --border:#1f2937;
+  --fg:#e5e7eb;
+  --muted:#9ca3af;
+  --accent:#f59e0b;
+  --good:#22c55e;
+  --bad:#ef4444;
+  --warn:#facc15;
 }
-
 *{box-sizing:border-box}
-
 body{
   margin:0;
-  font-family: ui-monospace, Menlo, Consolas, monospace;
-  background: radial-gradient(1200px 600px at 20% -10%, #141b3a 0%, var(--bg) 60%);
-  color: var(--fg);
+  font-family:Inter,system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--fg);
 }
-
-/* ===== HEADER ===== */
 header{
-  padding:18px 24px;
+  padding:26px;
+  text-align:center;
   border-bottom:1px solid var(--border);
-  background:#0b1024;
+  background:#020617;
 }
-header h1{margin:0;font-size:22px}
-header small{color:var(--muted)}
+header h1{
+  margin:0;
+  font-size:26px;
+  letter-spacing:.06em;
+}
+header p{
+  margin-top:8px;
+  font-size:14px;
+  color:var(--muted);
+}
 
-/* ===== LAYOUT ===== */
 main{
   max-width:1100px;
-  width:100%;
   margin:auto;
-  padding:24px;
-  overflow-x:hidden;
+  padding:28px;
 }
 
-/* ===== SECTIONS ===== */
 .section{
-  background:linear-gradient(180deg,var(--panel),#0f1533);
+  background:linear-gradient(180deg,#0f172a,#020617);
   border:1px solid var(--border);
-  border-radius:14px;
-  margin-bottom:20px;
-  padding:22px;
-
-  /* FIREFOX FIX */
-  min-width: 0;
+  border-radius:18px;
+  padding:24px;
+  margin-bottom:26px;
 }
 
 .section h2{
-  margin:0 0 14px;
+  margin:0 0 12px;
   color:var(--accent);
-  font-size:18px;
+  font-size:20px;
 }
 
-label{
-  display:block;
-  font-size:13px;
-  margin-bottom:6px;
+.section p,
+.section li{
+  font-size:14px;
   color:var(--muted);
+  line-height:1.7;
+}
+
+ul{margin-left:18px}
+
+.code,pre{
+  background:#020617;
+  border:1px solid #1e293b;
+  border-radius:12px;
+  padding:14px;
+  font-family:ui-monospace,monospace;
+  font-size:13px;
+  white-space:pre-wrap;
 }
 
 input,select,button{
   width:100%;
   padding:10px;
-  border-radius:8px;
+  margin-top:8px;
+  border-radius:10px;
   border:1px solid var(--border);
   background:#020617;
   color:var(--fg);
-  margin-bottom:12px;
 }
 
 button{
-  background:linear-gradient(135deg,#22c55e,#16a34a);
-  border:none;
-  font-weight:700;
+  background:linear-gradient(135deg,#f59e0b,#d97706);
+  font-weight:800;
   cursor:pointer;
 }
 
-button:hover{opacity:.9}
-
-/* ===== COMMAND ===== */
-.command{
-  font-size:13px;
-  padding:10px;
-  background:#020617;
-  border:1px solid #1e293b;
+.note{
+  margin-top:12px;
+  padding:12px;
+  border-left:4px solid var(--warn);
   border-radius:10px;
-
-  word-break: break-all;
-  max-inline-size: 100%;
-}
-
-/* ===== OUTPUT (FIREFOX-PROOF) ===== */
-.output-grid{
-  display:grid;
-  grid-template-columns: 1fr;
-
-  width:100%;
-  max-width:100%;
-  min-width:0;              /* KEY FIX */
-  overflow:hidden;
-}
-
-.terminal{
   background:#020617;
-  border:1px solid #1e293b;
-  border-radius:12px;
-  padding:14px;
-
-  height:420px;
-  overflow-y:auto;
-  overflow-x:hidden;
-
   font-size:13px;
-  line-height:1.5;
-
-  min-width:0;              /* KEY FIX */
-  max-inline-size:100%;     /* KEY FIX */
+  color:#fde68a;
 }
 
-.line{
-  white-space:pre-wrap;
-  word-break:break-all;
-  max-inline-size:100%;
-}
-
-/* ===== ERROR ===== */
-.error{
-  color:var(--error);
-  font-size:13px;
-  margin-top:6px;
-}
+.error{color:var(--bad)}
+.success{color:var(--good)}
 </style>
 </head>
 
 <body data-lesson="sqlmap">
 
 <header>
-  <h1>SQLMap</h1>
-  <small>SQL Injection automation — guided & safe execution</small>
+  <h1>EXPLOITATION AWARENESS</h1>
+  <p>Understanding vulnerabilities and exploit logic — not blind exploitation</p>
 </header>
 
 <main>
 
+<!-- 1 -->
 <section class="section">
-<h2>Run SQLMap (Safe Mode)</h2>
+<h2>1. What Is Exploitation?</h2>
+<p>
+Exploitation is the act of abusing a vulnerability to alter application behavior.
+A vulnerability does <b>not</b> guarantee successful exploitation.
+</p>
+<ul>
+  <li>Context matters</li>
+  <li>Environment matters</li>
+  <li>Defenses matter</li>
+</ul>
+</section>
 
-<label>Target URL</label>
-<input id="url"
-  placeholder="Enter target URL (e.g., http://example.com/page.php?id=1)"
+<!-- 2 -->
+<section class="section">
+<h2>2. Vulnerability vs Exploit</h2>
+<ul>
+  <li><b>Vulnerability:</b> A weakness in logic or configuration</li>
+  <li><b>Exploit:</b> A method to abuse that weakness</li>
+</ul>
+<p>
+Most public exploits fail because they ignore real-world constraints.
+</p>
+</section>
+
+<!-- 3 -->
+<section class="section">
+<h2>3. SQL Injection (Concept)</h2>
+<p>
+SQL injection occurs when user input is improperly handled and alters a database query.
+</p>
+<ul>
+  <li>Input validation failures</li>
+  <li>Improper query construction</li>
+  <li>Lack of parameterized queries</li>
+</ul>
+</section>
+
+<!-- 4 -->
+<section class="section">
+<h2>4. SQLMap — Guarded Demonstration</h2>
+
+<label for="url">Target URL (parameter required)</label>
+<input id="url" title="Target URL" placeholder="http://testphp.vulnweb.com/listproducts.php?cat=1&id=2"
   value="http://testphp.vulnweb.com/listproducts.php?cat=1&id=2">
 
 <label for="action">Action</label>
-<select id="action" name="action">
-  <option value="">Detect Injection</option>
+<select id="action" title="Select an action to perform">
+  <option value="">Basic Detection</option>
   <option value="--dbs">Enumerate Databases</option>
   <option value="--tables">Enumerate Tables</option>
 </select>
 
-<button id="run">Run SQLMap</button>
+<button onclick="runSQLMap()">Run Guarded Scan</button>
 
-<div class="command" id="cmd">— command will appear here —</div>
+<div class="note">
+Execution is restricted. Dangerous actions are blocked by the backend.
+</div>
 </section>
 
 <section class="section">
-<h2>Output</h2>
+<h2>Command Executed</h2>
+<pre id="cmd">—</pre>
+</section>
 
-<div class="output-grid">
-  <div class="terminal" id="terminal"></div>
-</div>
+<section class="section">
+<h2>Scan Output</h2>
+<pre id="output">—</pre>
+</section>
 
-<div id="err" class="error"></div>
+<!-- 5 -->
+<section class="section">
+<h2>5. Why Exploitation Fails in Real Life</h2>
+<ul>
+  <li>WAF and input filtering</li>
+  <li>Limited database permissions</li>
+  <li>Monitoring and alerting</li>
+  <li>Rate limiting</li>
+</ul>
+</section>
+
+<!-- 6 -->
+<section class="section">
+<h2>6. Metasploit (Theory Only)</h2>
+<p>
+Metasploit is an exploitation framework used to test known vulnerabilities.
+In real environments, it is:
+</p>
+<ul>
+  <li>Highly detectable</li>
+  <li>Often blocked</li>
+  <li>Rarely “one-click”</li>
+</ul>
+<p>
+Professional testers rely more on understanding than automation.
+</p>
+</section>
+
+<!-- 7 -->
+<section class="section">
+<h2>Defender’s Perspective</h2>
+<ul>
+  <li>SQL errors in logs</li>
+  <li>Unusual query patterns</li>
+  <li>WAF alerts</li>
+</ul>
+</section>
+
+<section class="section">
+<h2>Key Takeaways</h2>
+<ul>
+  <li>Exploitation is contextual</li>
+  <li>Automation does not equal success</li>
+  <li>Understanding defenses matters</li>
+</ul>
 </section>
 
 </main>
 
 <script>
-document.getElementById("run").onclick = async () => {
-  const term = document.getElementById("terminal");
-  const err = document.getElementById("err");
-  const cmd = document.getElementById("cmd");
-
-  term.innerHTML = "";
-  err.textContent = "";
-
+async function runSQLMap(){
   const url = document.getElementById("url").value.trim();
   const action = document.getElementById("action").value;
+  const out = document.getElementById("output");
+  const cmdBox = document.getElementById("cmd");
 
-  cmd.textContent =
-    `sqlmap -u "${url}" ${action} --batch --level=1 --risk=1`;
+  if(!url){
+    out.textContent = "Error: URL required";
+    out.className = "error";
+    return;
+  }
+
+  cmdBox.textContent = `sqlmap -u "${url}" ${action}`;
+  out.textContent = "Running guarded scan…";
 
   try{
     const res = await fetch("/run/sqlmap",{
       method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({url, action})
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({ url, action })
     });
 
-    const text = await res.text();
-    let data;
-    try { data = JSON.parse(text); }
-    catch { data = {stderr:text}; }
+    const data = await res.json();
+    out.textContent = data.stdout || data.stderr || "No output";
 
-    const output = data.stdout || data.stderr || "No output";
-
-    output.split("\n").forEach(line=>{
-      const div = document.createElement("div");
-      div.className = "line";
-      div.textContent = line;
-      term.appendChild(div);
-    });
-
-    term.scrollTop = term.scrollHeight;
-
-    if(!res.ok){
-      err.textContent = data.detail || "Execution error";
-    }
+  }catch(e){
+    out.textContent = "Backend unreachable";
   }
-  catch{
-    err.textContent = "Backend unreachable";
-  }
-};
+}
 </script>
+
 <script src="/static/lesson_tracker.js"></script>
 </body>
 </html>

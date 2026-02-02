@@ -3,102 +3,128 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Hydra – Password Attack Theory & Simulation</title>
+<title>Hydra – Online Credential Attacks</title>
 
 <style>
 :root{
   --bg:#0b0f1a;
-  --panel:#151c38;
-  --fg:#e8ebff;
-  --muted:#9aa3d1;
-  --accent:#ff9f43;
-  --border:#27306a;
-  --code:#020617;
+  --panel:#111827;
+  --border:#1f2937;
+  --fg:#e5e7eb;
+  --muted:#9ca3af;
+  --accent:#f97316;
   --good:#22c55e;
   --bad:#ef4444;
+  --warn:#f59e0b;
 }
 *{box-sizing:border-box}
 body{
   margin:0;
-  font-family: ui-monospace, Menlo, Consolas, monospace;
-  background:radial-gradient(1200px 600px at 20% -10%,#141b3a 0%,var(--bg) 60%);
+  font-family:Inter,system-ui,sans-serif;
+  background:var(--bg);
   color:var(--fg);
 }
 header{
-  padding:18px 24px;
+  padding:26px;
   border-bottom:1px solid var(--border);
-  background:#0b1024;
+  background:#020617;
+  text-align:center;
 }
-header h1{margin:0;font-size:22px}
-header small{color:var(--muted)}
+header h1{
+  margin:0;
+  font-size:26px;
+  letter-spacing:.05em;
+}
+header p{
+  margin-top:8px;
+  font-size:14px;
+  color:var(--muted);
+}
 
 main{
   max-width:1100px;
   margin:auto;
-  padding:24px;
+  padding:28px;
 }
 
 .section{
-  background:linear-gradient(180deg,var(--panel),#0f1533);
+  background:linear-gradient(180deg,#0f172a,#020617);
   border:1px solid var(--border);
-  border-radius:14px;
-  margin-bottom:20px;
-  padding:22px;
+  border-radius:18px;
+  padding:24px;
+  margin-bottom:26px;
 }
 
 .section h2{
   margin:0 0 12px;
-  color:var(--accent);
-  font-size:18px;
+  color:#fdba74;
+  font-size:20px;
 }
 
 .section p,
 .section li{
-  color:var(--muted);
   font-size:14px;
+  color:var(--muted);
   line-height:1.7;
 }
 
-.section ul{margin-left:18px}
+ul{margin-left:18px}
 
 .code{
-  background:linear-gradient(180deg,var(--code),#020617);
+  background:#020617;
   border:1px solid #1e293b;
   border-radius:12px;
   padding:14px;
-  margin-top:10px;
+  font-family:ui-monospace,monospace;
   font-size:13px;
   white-space:pre-wrap;
 }
 
+.tree{
+  background:#020617;
+  border:1px dashed var(--border);
+  border-radius:12px;
+  padding:14px;
+  font-size:13px;
+}
+
+.yes{color:var(--good);font-weight:700}
+.no{color:var(--bad);font-weight:700}
+
 button{
   padding:12px 16px;
-  border-radius:10px;
+  border-radius:12px;
   border:none;
-  background:linear-gradient(135deg,#22c55e,#16a34a);
-  color:#020617;
-  font-weight:700;
+  font-weight:800;
   cursor:pointer;
   margin-right:10px;
 }
-button:hover{opacity:.9}
+
+.normal{background:linear-gradient(135deg,#22c55e,#16a34a);color:#020617}
+.limit{background:linear-gradient(135deg,#f59e0b,#d97706);color:#020617}
+.mfa{background:linear-gradient(135deg,#ef4444,#b91c1c);color:white}
 
 .terminal{
   background:#020617;
   border:1px solid #1e293b;
   border-radius:12px;
   padding:14px;
-  margin-top:12px;
-  font-size:13px;
-  height:280px;
+  height:260px;
   overflow-y:auto;
   white-space:pre-wrap;
+  font-family:ui-monospace,monospace;
+  font-size:13px;
+  margin-top:14px;
 }
 
-.warn{
-  color:var(--bad);
-  font-size:12px;
-  margin-top:8px;
+.note{
+  margin-top:12px;
+  padding:12px;
+  border-left:4px solid var(--warn);
+  border-radius:10px;
+  background:#020617;
+  font-size:13px;
+  color:#fde68a;
 }
 </style>
 </head>
@@ -106,118 +132,109 @@ button:hover{opacity:.9}
 <body data-lesson="hydra">
 
 <header>
-  <h1>Hydra</h1>
-  <small>Online password attack tool — theory & safe simulation</small>
+  <h1>ONLINE CREDENTIAL ATTACKS (HYDRA)</h1>
+  <p>How attackers abuse logins — and why defenses stop them</p>
 </header>
 
 <main>
 
 <section class="section">
-<h2>1. What is Hydra?</h2>
+<h2>1. What Is Hydra?</h2>
 <p>
-THC Hydra is an <b>online password attack tool</b> used in authorized penetration
-tests to evaluate the strength of authentication mechanisms.
+Hydra is a parallelized <b>online login attack tool</b>.
+It tests authentication mechanisms by sending large volumes of login attempts.
 </p>
-<p>
-Hydra does not exploit software vulnerabilities. It abuses
-<b>weak, reused, or predictable credentials</b>.
-</p>
-</section>
-
-<section class="section">
-<h2>2. What Hydra Can and Cannot Do</h2>
 <ul>
-<li><b>Can:</b> Test login security on network services</li>
-<li><b>Can:</b> Identify weak passwords</li>
-<li><b>Cannot:</b> Bypass authentication logic</li>
-<li><b>Cannot:</b> Break encryption or hashes</li>
+  <li>Targets live login services</li>
+  <li>Requires network access</li>
+  <li>Highly detectable</li>
 </ul>
 </section>
 
 <section class="section">
-<h2>3. How Hydra Works</h2>
+<h2>2. What Hydra Is NOT</h2>
+<ul>
+  <li>Not a vulnerability scanner</li>
+  <li>Not stealthy</li>
+  <li>Not effective against MFA</li>
+</ul>
+<p>
+Hydra does not bypass authentication — it abuses weak controls.
+</p>
+</section>
+
+<section class="section">
+<h2>3. Online Attack Flow</h2>
 <div class="code">
-Username list
-Password list
+Usernames + Passwords
         ↓
-Parallel login attempts
+Login requests sent
         ↓
-Server responses
+Responses analyzed
         ↓
-Success or failure detection
+Valid credentials found
 </div>
 </section>
 
 <section class="section">
-<h2>4. Services Commonly Tested</h2>
+<h2>4. Why Online Attacks Usually Fail</h2>
 <ul>
-<li>SSH</li>
-<li>FTP / SFTP</li>
-<li>HTTP / HTTPS login forms</li>
-<li>RDP</li>
-<li>SMB</li>
-<li>Databases</li>
+  <li>Rate limiting</li>
+  <li>Account lockouts</li>
+  <li>MFA challenges</li>
+  <li>Security monitoring</li>
 </ul>
 </section>
 
 <section class="section">
-<h2>5. Example Attack Scenario (Theory)</h2>
-<p>
-A server exposes SSH with weak passwords and no MFA.
-</p>
-<div class="code">
-hydra -l admin -P passwords.txt ssh://target
+<h2>5. Decision Tree — When Is Hydra Appropriate?</h2>
+
+<div class="tree">
+<p>Authorized penetration test?</p>
+<p class="yes">YES</p>
+<p>Controlled lab environment?</p>
+<p class="yes">YES → Hydra allowed</p>
 </div>
-</section>
 
-<section class="section">
-<h2>6. Why Hydra is Dangerous</h2>
-<ul>
-<li>Thousands of attempts per minute</li>
-<li>Causes account lockouts</li>
-<li>Used in ransomware intrusions</li>
-</ul>
-</section>
+<br>
 
-<section class="section">
-<h2>7. Detection and Defense</h2>
-<ul>
-<li>Rate limiting</li>
-<li>Account lockout</li>
-<li>Multi-Factor Authentication (MFA)</li>
-<li>Log monitoring</li>
-</ul>
-</section>
-
-<section class="section">
-<h2>8. When to Use / When NOT to Use Hydra</h2>
-<div class="code">
-Authorized penetration test → YES
-Production system          → NEVER
-Learning without permission→ ILLEGAL
+<div class="tree">
+<p>Production system or no permission?</p>
+<p class="no">YES → Never use Hydra</p>
 </div>
+
 </section>
 
 <section class="section">
-<h2>9. Hydra vs John the Ripper</h2>
-<ul>
-<li>Hydra → Online attacks</li>
-<li>John → Offline hash cracking</li>
-</ul>
-</section>
+<h2>6. Safe Attack Flow Simulation</h2>
 
-<section class="section">
-<h2>10. Hydra Attack Flow Simulation (Safe)</h2>
-
-<button onclick="simulate('normal')">Normal Attack</button>
-<button onclick="simulate('ratelimit')">Rate-Limit Blocked</button>
-<button onclick="simulate('mfa')">MFA Blocked</button>
+<button class="normal" onclick="simulate('normal')">Normal Attack</button>
+<button class="limit" onclick="simulate('rate')">Rate-Limited</button>
+<button class="mfa" onclick="simulate('mfa')">MFA Blocked</button>
 
 <div class="terminal" id="terminal">— waiting —</div>
 
-<p class="warn">
-Simulation only. No real authentication attempts are performed.
-</p>
+<div class="note">
+Simulation only. No real login attempts are performed.
+</div>
+</section>
+
+<section class="section">
+<h2>7. Defender’s Perspective</h2>
+<ul>
+  <li>Bursts of failed logins</li>
+  <li>IP reputation alerts</li>
+  <li>MFA challenge failures</li>
+</ul>
+</section>
+
+<section class="section">
+<h2>Key Takeaways</h2>
+<ul>
+  <li>Hydra targets weak authentication, not vulnerabilities</li>
+  <li>MFA breaks online credential attacks completely</li>
+  <li>Offline attacks are far more dangerous</li>
+</ul>
 </section>
 
 </main>
@@ -231,54 +248,45 @@ function simulate(mode){
 
   if(mode === "normal"){
     steps = [
-      "[INFO] Hydra v9.5",
-      "[INFO] Target: ssh://192.168.1.10",
-      "",
-      "[ATTEMPT] admin : admin123",
-      "[ATTEMPT] admin : password",
-      "[ATTEMPT] admin : letmein",
-      "",
-      "[SUCCESS] Valid credentials found",
-      "[RESULT] admin : letmein",
+      "[INFO] Hydra started",
+      "[INFO] Target login page detected",
+      "[STATUS] Trying credentials",
+      "[STATUS] Trying credentials...",
+      "[SUCCESS] Valid credentials found: admin:admin123",
       "[INFO] Attack completed"
     ];
   }
 
-  if(mode === "ratelimit"){
+  if(mode === "rate"){
     steps = [
-      "[INFO] Hydra v9.5",
-      "",
-      "[ATTEMPT] admin : admin123",
-      "[ATTEMPT] admin : password",
-      "",
-      "[BLOCKED] Too many attempts detected",
-      "[INFO] Rate limiting stopped attack"
+      "[INFO] Hydra started",
+      "[STATUS] Sending login attempts",
+      "[WARNING] Too many failed attempts",
+      "[BLOCKED] Rate limit enforced",
+      "[INFO] Attack stopped"
     ];
   }
 
   if(mode === "mfa"){
     steps = [
-      "[INFO] Hydra v9.5",
-      "",
-      "[ATTEMPT] admin : letmein",
-      "[INFO] Password accepted",
-      "[MFA] One-time code required",
-      "",
-      "[FAILED] MFA blocks attack"
+      "[INFO] Hydra started",
+      "[STATUS] Valid password submitted",
+      "[MFA] Secondary authentication required",
+      "[FAILED] MFA challenge not satisfied",
+      "[INFO] Attack ineffective"
     ];
   }
 
   let i = 0;
-  const interval = setInterval(() => {
+  const interval = setInterval(()=>{
     terminal.textContent += steps[i] + "\n";
     terminal.scrollTop = terminal.scrollHeight;
     i++;
     if(i >= steps.length) clearInterval(interval);
-  }, 600);
+  }, 700);
 }
 </script>
 
 <script src="/static/lesson_tracker.js"></script>
-
 </body>
 </html>

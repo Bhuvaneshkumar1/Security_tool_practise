@@ -3,173 +3,84 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Nmap Practice – Optimized</title>
+<title>Reconnaissance & Discovery</title>
 
 <style>
 :root{
   --bg:#0b0f1a;
-  --panel:#11172a;
-  --card:#151c38;
-  --fg:#e8ebff;
-  --muted:#9aa3d1;
-  --accent:#4f7cff;
-  --accent-2:#00e5ff;
-  --border:#27306a;
-  --error:#ff5c5c;
-  --success:#00ff9c;
-  --terminal:#020617;
+  --panel:#111827;
+  --border:#1f2937;
+  --fg:#e5e7eb;
+  --muted:#9ca3af;
+  --accent:#3b82f6;
+  --good:#22c55e;
+  --warn:#f59e0b;
+  --bad:#ef4444;
 }
-
 *{box-sizing:border-box}
-
 body{
   margin:0;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  background:radial-gradient(1200px 600px at 20% -10%,#141b3a 0%,var(--bg) 60%);
+  font-family:Inter,system-ui,sans-serif;
+  background:var(--bg);
   color:var(--fg);
 }
-
 header{
-  position:sticky;
-  top:0;
-  z-index:10;
-  background:linear-gradient(90deg,#0b1024,#111944);
-  border-bottom:1px solid var(--border);
-}
-
-header h1{
-  margin:0;
-  padding:16px 24px 4px;
-  font-size:22px;
-}
-
-header small{
-  display:block;
-  padding:0 24px 14px;
-  color:var(--muted);
-}
-
-main{
-  max-width:1400px;
-  margin:auto;
   padding:24px;
-  display:grid;
-  grid-template-columns: 2fr 1fr;
-  gap:20px;
+  text-align:center;
+  border-bottom:1px solid var(--border);
+  background:#020617;
 }
+header h1{margin:0;font-size:26px;letter-spacing:.08em}
+header p{margin-top:8px;font-size:14px;color:var(--muted)}
 
-.card{
-  background:linear-gradient(180deg,var(--card),#0f1533);
+main{max-width:1100px;margin:auto;padding:28px}
+
+.section{
+  background:linear-gradient(180deg,#0f172a,#020617);
   border:1px solid var(--border);
+  border-radius:18px;
+  padding:24px;
+  margin-bottom:26px;
+}
+.section h2{margin:0 0 12px;color:var(--accent)}
+.section p,.section li{font-size:14px;color:var(--muted);line-height:1.7}
+ul{margin-left:18px}
+
+.code,pre{
+  background:#020617;
+  border:1px solid #1e293b;
   border-radius:12px;
-  padding:18px;
-  box-shadow:0 10px 40px rgba(0,0,0,.35);
+  padding:14px;
+  font-family:ui-monospace,monospace;
+  font-size:13px;
+  white-space:pre-wrap;
 }
 
-h2{
-  margin:0 0 14px;
-  font-size:16px;
-  color:var(--accent-2);
-  letter-spacing:.5px;
-}
-
-label{
-  display:block;
-  margin-top:10px;
-  font-size:12px;
-  color:var(--muted);
-}
-
-input,select{
+input,select,button{
   width:100%;
-  margin-top:4px;
-  padding:10px 12px;
-  border-radius:8px;
+  padding:10px;
+  margin-top:8px;
+  border-radius:10px;
   border:1px solid var(--border);
-  background:#060b20;
+  background:#020617;
   color:var(--fg);
-}
-
-input:focus,select:focus{
-  outline:none;
-  border-color:var(--accent);
 }
 
 button{
-  width:100%;
-  margin-top:14px;
-  padding:12px;
-  border-radius:10px;
-  border:none;
-  background:linear-gradient(135deg,var(--accent),#2e4bff);
-  color:white;
+  background:linear-gradient(135deg,#3b82f6,#2563eb);
   font-weight:700;
-  letter-spacing:.6px;
   cursor:pointer;
 }
 
-button:hover{
-  filter:brightness(1.1);
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:14px;
-}
-
-ul{
-  list-style:none;
-  padding:0;
-  margin:0;
-}
-
-li{
-  padding:8px 10px;
-  margin-bottom:6px;
-  border-radius:6px;
-  border:1px solid transparent;
-  cursor:pointer;
-}
-
-li:hover{
-  background:#0b1230;
-  border-color:var(--border);
-}
-
-code{
-  background:#050818;
-  padding:2px 6px;
-  border-radius:4px;
-  color:var(--accent-2);
-}
-
-pre{
-  background:linear-gradient(180deg,var(--terminal),#020617);
-  border:1px solid #1e293b;
-  border-radius:12px;
-  padding:16px;
-  height:320px;
-  overflow:auto;
+.error{color:var(--bad)}
+.note{
+  margin-top:12px;
+  padding:12px;
+  background:#020617;
+  border-left:4px solid var(--warn);
+  border-radius:10px;
+  color:#fde68a;
   font-size:13px;
-  line-height:1.5;
-  color:#c7d2fe;
-}
-
-pre::before{
-  content:"terminal";
-  display:block;
-  color:#64748b;
-  font-size:11px;
-  margin-bottom:6px;
-}
-
-.error{
-  color:var(--error);
-}
-
-@media(max-width:1000px){
-  main{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -177,129 +88,111 @@ pre::before{
 <body data-lesson="nmap">
 
 <header>
-  <h1>Nmap Practice Console</h1>
-  <small>Interactive backend-powered reconnaissance environment</small>
+  <h1>RECONNAISSANCE & DISCOVERY</h1>
+  <p>Mapping attack surface before exploitation</p>
 </header>
 
 <main>
 
-<!-- LEFT COLUMN -->
-<div class="card">
-<h2>Command Builder</h2>
+<section class="section">
+<h2>1. What Is Reconnaissance?</h2>
+<p>
+Reconnaissance is the process of identifying hosts, services, and technologies
+before attempting exploitation. Most attacks fail because this phase is rushed.
+</p>
+</section>
 
-<div class="grid">
-<div>
-<label>Target</label>
-<input id="target" placeholder="IP / CIDR / Domain">
-</div>
-<div>
-<label>Preset</label>
-<select id="preset" title="Select a preset nmap scan configuration"></select>
-</div>
-</div>
+<section class="section">
+<h2>2. Passive vs Active Reconnaissance</h2>
+<ul>
+  <li><b>Passive:</b> DNS, certificates, public metadata (low noise)</li>
+  <li><b>Active:</b> Port scanning, service detection (detectable)</li>
+</ul>
+</section>
 
-<label>Ports</label>
-<input id="ports" placeholder="22,80,443">
+<section class="section">
+<h2>3. Active Reconnaissance — Nmap (Live)</h2>
 
-<label>Extra Flags</label>
-<input id="extra" placeholder="-Pn -v">
+<label>Target (IP / Hostname)</label>
+<input id="target" placeholder="scanme.nmap.org">
 
-<button id="build">RUN NMAP</button>
+<label for="scan">Scan Type</label>
+<select id="scan">
+  <option value="-sS">TCP SYN Scan</option>
+  <option value="-sV">Service Detection</option>
+  <option value="-O">OS Detection</option>
+</select>
+
+<button onclick="runNmap()">Run Recon Scan</button>
+
+<div class="note">
+Only controlled scans are allowed. Output is for learning interpretation.
 </div>
+</section>
 
-<!-- RIGHT COLUMN -->
-<div class="card">
-<h2>Command Reference</h2>
-<ul id="ref"></ul>
-</div>
+<section class="section">
+<h2>Command Executed</h2>
+<pre id="cmd">—</pre>
+</section>
 
-<!-- FULL WIDTH OUTPUT -->
-<div class="card" style="grid-column:1/-1">
-<h2>Output</h2>
-<pre id="out">—</pre>
-</div>
+<section class="section">
+<h2>Scan Output</h2>
+<pre id="output">—</pre>
+</section>
+
+<section class="section">
+<h2>4. Interpreting Recon Output</h2>
+<ul>
+  <li>Open ports ≠ vulnerabilities</li>
+  <li>Version info guides next phase</li>
+  <li>OS detection is probabilistic</li>
+</ul>
+</section>
+
+<section class="section">
+<h2>5. Defender’s Perspective</h2>
+<ul>
+  <li>Port scan patterns are logged</li>
+  <li>Aggressive scans raise alerts</li>
+  <li>Rate matters more than tools</li>
+</ul>
+</section>
 
 </main>
 
 <script>
-(() => {
-const data = [
- {name:"Basic scan", flags:""},
- {name:"Ping scan", flags:"-sn"},
- {name:"Port scan", flags:"-p 22,80,443"},
- {name:"Verbose", flags:"-v"},
- {name:"Service detection", flags:"-sV"},
- {name:"OS detection", flags:"-O"},
- {name:"Default scripts", flags:"-sC"},
- {name:"Aggressive", flags:"-A"},
- {name:"TCP SYN", flags:"-sS"},
- {name:"UDP", flags:"-sU"}
-];
+async function runNmap(){
+  const target = document.getElementById("target").value.trim();
+  const scan = document.getElementById("scan").value;
+  const out = document.getElementById("output");
+  const cmdBox = document.getElementById("cmd");
 
-const $ = id => document.getElementById(id);
-const ref = $('ref');
-const preset = $('preset');
-const out = $('out');
-
-preset.innerHTML = `<option value="">Custom</option>`;
-
-data.forEach((d,i)=>{
-  const li = document.createElement('li');
-  li.innerHTML = `<b>${d.name}</b><br><code>nmap ${d.flags || "target"}</code>`;
-  li.onclick = () => preset.selectedIndex = i + 1;
-  ref.appendChild(li);
-
-  const o = document.createElement('option');
-  o.value = d.flags;
-  o.textContent = d.name;
-  preset.appendChild(o);
-});
-
-$('build').onclick = async () => {
-  out.classList.remove("error");
-  out.textContent = "Running…";
-
-  const target = $('target').value.trim();
-  if (!target) {
-    out.textContent = "Error: Target is required";
-    out.classList.add("error");
+  if(!target){
+    out.textContent = "Error: Target required";
+    out.className = "error";
     return;
   }
 
-  const args = [];
-  if (preset.value) args.push(preset.value);
-  if ($('ports').value) args.push("-p", $('ports').value.trim());
-  if ($('extra').value) args.push($('extra').value.trim());
-  args.push(target);
+  const args = `${scan} ${target}`;
+  cmdBox.textContent = `nmap ${args}`;
+  out.textContent = "Running scan…";
 
-  try {
-    const res = await fetch("/run/nmap", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ args: args.join(" ") })
+  try{
+    const res = await fetch("/run/nmap",{
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({ args })
     });
 
-    const text = await res.text();
-    let payload;
-    try { payload = JSON.parse(text); } catch { payload = { stderr: text }; }
+    const data = await res.json();
+    out.textContent = data.stdout || data.stderr || "No output";
 
-    if (!res.ok) {
-      out.textContent = payload.detail || payload.stderr || "Backend error";
-      out.classList.add("error");
-      return;
-    }
-
-    out.textContent = payload.stdout || payload.stderr || "No output";
-    if (payload.stderr) out.classList.add("error");
-
-  } catch (e) {
-    out.textContent = "Network / backend unreachable";
-    out.classList.add("error");
+  }catch(e){
+    out.textContent = "Backend unreachable";
   }
-};
-
-})();
+}
 </script>
+
 <script src="/static/lesson_tracker.js"></script>
 </body>
 </html>

@@ -3,8 +3,8 @@ import os
 import subprocess
 import re
 
-from fastapi import FastAPI, HTTPException, Body
-from fastapi.responses import FileResponse
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import uvicorn
@@ -16,8 +16,7 @@ app = FastAPI()
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TRAINING_DIR = os.path.join(BASE_DIR, "training")
 
-# ---------------- STATIC FILES (CRITICAL FIX) ----------------
-# This allows /static/lesson_tracker.js to load
+# ---------------- STATIC FILES ----------------
 app.mount(
     "/static",
     StaticFiles(directory=TRAINING_DIR),
@@ -47,7 +46,7 @@ async def read_root():
         }
     )
 
-# ---------------- NMAP ----------------
+# ---------------- RECONNAISSANCE (NMAP) ----------------
 
 @app.get("/nmap")
 async def read_nmap():
@@ -62,7 +61,6 @@ class NmapRequest(BaseModel):
 @app.post("/run/nmap")
 async def run_nmap(payload: NmapRequest):
     system_check()
-
     cmd = ["nmap"] + payload.args.split()
 
     try:
@@ -80,7 +78,7 @@ async def run_nmap(payload: NmapRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# ---------------- NETCAT (THEORY ONLY) ----------------
+# ---------------- ENUMERATION (NETCAT) ----------------
 
 @app.get("/netcat")
 async def read_netcat():
@@ -89,17 +87,9 @@ async def read_netcat():
         os.path.join(TRAINING_DIR, "netcat.html")
     )
 
-# ---------------- METASPLOIT (THEORY ONLY) ----------------
+# ---------------- EXPLOITATION AWARENESS ----------------
 
-@app.get("/metasploit")
-async def read_metasploit():
-    system_check()
-    return FileResponse(
-        os.path.join(TRAINING_DIR, "metasploit.html")
-    )
-
-# ---------------- SQLMAP ----------------
-
+# SQLMap (guarded execution)
 @app.get("/sqlmap")
 async def read_sqlmap():
     system_check()
@@ -118,8 +108,7 @@ def validate_sqlmap_input(url: str, action: str):
             detail="URL must include a parameter"
         )
 
-    allowed_actions = {"", "--dbs", "--tables"}
-    if action not in allowed_actions:
+    if action not in {"", "--dbs", "--tables"}:
         raise HTTPException(
             status_code=400,
             detail="Action not allowed"
@@ -175,7 +164,25 @@ async def run_sqlmap(payload: SQLMapRequest):
             "code": 124
         }
 
-# ---------------- PASSWORD CRACKING ----------------
+# ---------------- METASPLOIT (THEORY ONLY) ----------------
+
+# New canonical route
+@app.get("/exploitation/metasploit")
+async def read_metasploit_exploitation():
+    system_check()
+    return FileResponse(
+        os.path.join(TRAINING_DIR, "metasploit.html")
+    )
+
+# Backward compatibility redirect
+@app.get("/metasploit")
+async def redirect_metasploit():
+    return RedirectResponse(
+        url="/exploitation/metasploit",
+        status_code=301
+    )
+
+# ---------------- CREDENTIAL ATTACKS ----------------
 
 @app.get("/password_cracking")
 async def read_password_cracking():
@@ -184,22 +191,18 @@ async def read_password_cracking():
         os.path.join(TRAINING_DIR, "password_cracking.html")
     )
 
-# ---------------- JOHN THE RIPPER ----------------
+@app.get("/hydra")
+async def read_hydra():
+    system_check()
+    return FileResponse(
+        os.path.join(TRAINING_DIR, "hydra.html")
+    )
 
 @app.get("/john")
 async def read_john():
     system_check()
     return FileResponse(
         os.path.join(TRAINING_DIR, "john_the_ripper.html")
-    )
-
-# ---------------- HYDRA ----------------
-
-@app.get("/hydra")
-async def read_hydra():
-    system_check()
-    return FileResponse(
-        os.path.join(TRAINING_DIR, "hydra.html")
     )
 
 # ---------------- QUIZ ----------------
