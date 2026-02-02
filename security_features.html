@@ -240,39 +240,28 @@ footer{
 </div>
 
 <script>
-const REQUIRED_TOOLS = [
-  "nmap",
-  "sqlmap",
-  "netcat",
-  "metasploit",
-  "password_cracking"
+const REQUIRED_PHASES = [
+  "reconnaissance",
+  "enumeration",
+  "exploitation",
+  "credential_attacks"
 ];
 
-const completed = REQUIRED_TOOLS.filter(
-  id => localStorage.getItem(`lesson:${id}`) === "done"
+const completed = REQUIRED_PHASES.filter(
+  p => localStorage.getItem(`lesson:${p}`) === "done"
 ).length;
 
-const percent = Math.round((completed / REQUIRED_TOOLS.length) * 100);
+const percent = Math.round((completed / REQUIRED_PHASES.length) * 100);
 
 document.getElementById("progressBar").style.width = percent + "%";
 document.getElementById("progressText").textContent =
   `${percent}% completed`;
 
-/* ✅ Show quiz ONLY at 100% */
 if (percent === 100) {
-  document.getElementById("quizWrapper").style.display = "block";
+  document.getElementById("quizBtn").style.display = "block";
 }
-
-/* ✅ Mark completed tools */
-document.querySelectorAll("[data-tool]").forEach(el => {
-  const id = el.dataset.tool;
-  if (localStorage.getItem(`lesson:${id}`) === "done") {
-    const badge = el.querySelector(".badge");
-    badge.textContent = "COMPLETED";
-    badge.classList.add("done");
-  }
-});
 </script>
+
 
 </body>
 </html>
