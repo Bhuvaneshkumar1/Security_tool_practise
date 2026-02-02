@@ -13,7 +13,6 @@
   --fg:#e5e7eb;
   --muted:#9ca3af;
   --accent:#3b82f6;
-  --accent2:#22c55e;
   --done:#22c55e;
 }
 
@@ -104,17 +103,17 @@ ul{
   border-color:var(--accent);
 }
 
-.tool .left{
+.left{
   display:flex;
   flex-direction:column;
 }
 
-.tool .name{
+.name{
   font-size:15px;
   font-weight:600;
 }
 
-.tool .desc{
+.desc{
   font-size:12px;
   color:var(--muted);
   margin-top:4px;
@@ -172,57 +171,47 @@ footer{
     <div id="progressText" class="progress-text">0% completed</div>
   </div>
 
-  <p>Ethical security learning • safe simulations • theory-first</p>
+  <p>Ethical security learning • theory-first • safe simulations</p>
 </header>
 
 <ul>
 <li>
-<a class="tool" href="/nmap" target="_blank" data-tool="nmap">
+<a class="tool" href="/nmap" target="_blank" data-phase="reconnaissance">
   <div class="left">
-    <div class="name">Reconnaissance & Discovery</div>
-    <div class="desc">Identify hosts, services, and attack surface</div>
+    <div class="name">Reconnaissance</div>
+    <div class="desc">Hosts, ports, services, attack surface</div>
   </div>
-  <span class="badge">LIVE</span>
+  <span class="badge">PHASE 1</span>
 </a>
 </li>
 
 <li>
-<a class="tool" href="/exploitation/metasploit" target="_blank" data-tool="metasploit">
+<a class="tool" href="/netcat" target="_blank" data-phase="enumeration">
   <div class="left">
-    <div class="name">Metasploit</div>
-    <div class="desc">Exploitation framework (theory)</div>
+    <div class="name">Enumeration</div>
+    <div class="desc">Service behavior, banners, manual probing</div>
   </div>
-  <span class="badge">THEORY</span>
+  <span class="badge">PHASE 2</span>
 </a>
 </li>
 
 <li>
-<a class="tool" href="/netcat" target="_blank" data-tool="netcat">
-  <div class="left">
-    <div class="name">Enumeration & Mapping</div>
-    <div class="desc">Extract service details and application behavior</div>
-  </div>
-  <span class="badge">SAFE</span>
-</a>
-</li>
-
-<li>
-<a class="tool" href="/sqlmap" target="_blank" data-tool="sqlmap">
+<a class="tool" href="/sqlmap" target="_blank" data-phase="exploitation">
   <div class="left">
     <div class="name">Exploitation Awareness</div>
-    <div class="desc">Understand Vulnerabilities and exploit logic</div>
+    <div class="desc">Vulnerabilities & exploit logic</div>
   </div>
-  <span class="badge">GUIDED</span>
+  <span class="badge">PHASE 3</span>
 </a>
 </li>
 
 <li>
-<a class="tool" href="/password_cracking" target="_blank" data-tool="password_cracking">
+<a class="tool" href="/password_cracking" target="_blank" data-phase="credential_attacks">
   <div class="left">
     <div class="name">Credential Attacks</div>
-    <div class="desc">Password abuse • Hashes • and Real Breaches</div>
+    <div class="desc">Hydra, John, hashes & real breaches</div>
   </div>
-  <span class="badge">ADVANCED</span>
+  <span class="badge">PHASE 4</span>
 </a>
 </li>
 </ul>
@@ -240,6 +229,7 @@ footer{
 </div>
 
 <script>
+/* ===== PHASES (single source of truth) ===== */
 const REQUIRED_PHASES = [
   "reconnaissance",
   "enumeration",
@@ -247,6 +237,7 @@ const REQUIRED_PHASES = [
   "credential_attacks"
 ];
 
+/* ===== Progress calculation ===== */
 const completed = REQUIRED_PHASES.filter(
   p => localStorage.getItem(`lesson:${p}`) === "done"
 ).length;
@@ -257,11 +248,22 @@ document.getElementById("progressBar").style.width = percent + "%";
 document.getElementById("progressText").textContent =
   `${percent}% completed`;
 
+/* ===== Badge update ===== */
+document.querySelectorAll("[data-phase]").forEach(el => {
+  const phase = el.dataset.phase;
+  const badge = el.querySelector(".badge");
+
+  if (localStorage.getItem(`lesson:${phase}`) === "done") {
+    badge.textContent = "COMPLETED";
+    badge.classList.add("done");
+  }
+});
+
+/* ===== Quiz unlock ===== */
 if (percent === 100) {
-  document.getElementById("quizBtn").style.display = "block";
+  document.getElementById("quizWrapper").style.display = "block";
 }
 </script>
-
 
 </body>
 </html>
