@@ -1,117 +1,178 @@
-# 🛡️ Security Tools Practice Lab
+# 🛡️ Security Practice Lab
 
-A professional, recruiter-grade learning platform to understand
-offensive security tools through **theory, simulation, and validation**.
+A **phase-based offensive security learning platform** focused on  
+**understanding attack techniques safely, ethically, and correctly**.
 
----
+This project is designed to demonstrate **real-world security concepts** using:
+- Guided theory
+- Safe simulations
+- Guarded live tooling
+- Progress tracking
+- Final assessment (quiz)
 
-## 🎯 Objective
-
-This project demonstrates:
-- Ethical understanding of security tools
-- Realistic attack workflows (safe mode)
-- Enforced learning completion
-- Quiz-based validation
-- Certificate generation
+Built for **learning, interviews, and portfolio demonstration**.
 
 ---
 
-## 🧰 Tools Covered
+## 🎯 Learning Philosophy
 
-- Nmap
-- SQLMap
-- Netcat (theory)
-- Metasploit (theory)
-- Password Cracking
-- Hydra (simulation)
-- John the Ripper (simulation)
+> “Understand before executing.”
 
----
-
-## 🧠 Learning Flow
-
-1. User must scroll through **all tool pages**
-2. Each page is auto-marked completed
-3. Progress bar updates on home page
-4. Final quiz unlocks only at **100% completion**
-5. Quiz contains 30 MCQs
-6. Certificate is generated on pass
+This lab **does not encourage blind exploitation**.  
+Each phase teaches:
+- Why attacks work
+- How attackers think
+- How defenders detect and stop them
+- When tools should and should not be used
 
 ---
 
-## 🚀 Tech Stack
+## 🧠 Training Phases
 
-- Frontend: HTML, CSS, Vanilla JavaScript
-- Backend: FastAPI (Python)
-- Execution: Safe subprocess execution
-- State tracking: Browser localStorage
+### Phase 1 — Reconnaissance
+**Goal:** Identify hosts, ports, services, and attack surface  
+**Tools:**  
+- Nmap (guarded execution)
 
 ---
 
-## 🧪 Setup Instructions (IMPORTANT)
+### Phase 2 — Enumeration
+**Goal:** Understand service behavior and application responses  
+**Tools:**  
+- Netcat (theory + safe usage patterns)
 
-### 1️⃣ Create a Virtual Environment (Recommended)
+---
 
-Using a virtual environment avoids dependency conflicts.
+### Phase 3 — Exploitation Awareness
+**Goal:** Learn how vulnerabilities are abused (without unsafe execution)  
+**Tools:**  
+- SQLMap (strictly limited, guarded mode)
+- Metasploit (theory-only walkthrough)
+
+---
+
+### Phase 4 — Credential Attacks
+**Goal:** Understand password abuse and real-world breaches  
+**Tools:**  
+- Hydra (online attack theory + simulation)
+- John the Ripper (offline hash cracking simulation)
+
+---
+
+### Final — Knowledge Validation
+- Progress-based unlock
+- 30-question MCQ quiz
+- Score-based feedback
+- Completion readiness check
+
+---
+
+## 🔐 Safety & Ethics
+
+This platform enforces:
+- ❌ No destructive exploitation
+- ❌ No OS-level shells
+- ❌ No file read/write abuse
+- ❌ No privilege escalation
+- ❌ No unauthorized targets
+
+All executions are:
+- Guarded
+- Rate-limited
+- Input-validated
+- Designed for **local or lab environments only**
+
+> ⚠️ Use only on systems you own or have permission to test.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Backend:** FastAPI (Python)
+- **Frontend:** Vanilla HTML / CSS / JavaScript
+- **Execution:** Subprocess (guarded)
+- **Storage:** Browser LocalStorage (progress tracking)
+
+---
+
+## 📂 Project Structure
+```bash
+Security_Practice_Lab/
+│
+├── attacks.py # FastAPI backend
+├── security_features.html # Main dashboard
+├── training/
+│ ├── nmap.html
+│ ├── netcat.html
+│ ├── sqlmap.html
+│ ├── metasploit.html
+│ ├── password_cracking.html
+│ ├── hydra.html
+│ ├── john_the_ripper.html
+│ ├── quiz.html
+│ └── lesson_tracker.js
+│
+├── README.md
+└── .gitignore
+
+```
+---
+
+## ▶️ How to Run
+
+### 1. Create a virtual environment (recommended)
 
 ```bash
 python3 -m venv venv
-source venv/bin/activate
 ```
-On Windows:
-```bash
-venv\Scripts\activate
-```
-On Linux/Mac
+### 2. Activate virtual environment
 ```bash
 source venv/bin/activate
 ```
-2️⃣ Install Dependencies
+
+### 3. Install dependencies
 ```bash
 pip install -r requirements.txt
 ```
-3️⃣ Run the Application
+Tools like nmap and sqlmap must already be installed on the system.
+
+### 4. Start the server
 ```bash
 uvicorn attacks:app --reload
 ```
-Open in browser:
+### Open in browser:
 ```bash
 http://127.0.0.1:8000
 ```
-🔐 Security Principles
-No destructive commands
+🧪 Supported Platforms
+OS	Status
+- **Linux**	  - ✅ Fully supported
+- **macOS**	  - ✅ Supported
+- **Windows**	- ❌ Not supported (tooling limitations)
 
-SQLMap runs in restricted mode
+🎓 Who This Is For
+Security students
 
-No live exploitation
+1. thical hacking learners
 
-Designed strictly for education
+2. Interview preparation
+
+3. Portfolio demonstration
+
+4. Educators and mentors
 
 📜 Disclaimer
 This project is for educational purposes only.
-All tools must be used with proper authorization.
+The author is not responsible for misuse.
 
-👤 Author
-Built to demonstrate real understanding, not shortcuts.
+Always follow:
 
+- Local laws
 
----
+- Organizational policies
 
-# 🚫 `.gitignore`
+- Ethical guidelines
 
-```gitignore
-# Python
-__pycache__/
-*.pyc
-
-# Virtual Environment
-venv/
-.env/
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Editor
-.vscode/
-.idea/
+⭐ Final Note
+If you understand everything in this lab,
+you are not a script-kiddie — you are thinking like a security engineer.
